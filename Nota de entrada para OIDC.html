@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	<title></title>
+	<meta name="generator" content="LibreOffice 26.2.3.1 (Windows)"/>
+	<meta name="created" content="2026-10-11T16:00:56.593015100"/>
+	<meta name="changed" content="2026-10-11T16:03:23.732198300"/>
+	<style type="text/css">
+		@page { size: 21cm 29.7cm; margin: 2cm }
+		p { line-height: 115%; margin-bottom: 0.25cm; background: transparent }
+		td p { orphans: 0; widows: 0; background: transparent }
+		th p { font-weight: bold; text-align: center; orphans: 0; widows: 0; background: transparent }
+		strong { font-weight: bold }
+		code.western { font-family: "Liberation Mono", monospace }
+		code.cjk { font-family: "NSimSun", monospace }
+		code.ctl { font-family: "Liberation Mono", monospace }
+	</style>
+</head>
+<body lang="pt-BR" link="#000080" vlink="#800000" dir="ltr"><p><strong>Foque
+</strong><strong>nos pontos importantes.</strong> O manual completo
+que também foi elaborado e disponibilizado (
+Manual_GH200_OIDC_Azure_Passo_a_Passo.pdf ) serve para praticar a
+integração; para estudar OIDC na GH-200, priorize entender o
+funcionamento e interpretar o YAML.</p>
+<p><br/>
+<br/>
+
+</p>
+<p>Concentre a revisão nestes pontos:</p>
+<table cellpadding="2" cellspacing="2">
+	<thead>
+		<tr>
+			<th style="border: none; padding: 0cm"><p>Ponto</p>
+			</th>
+			<th style="border: none; padding: 0cm"><p>O que você deve saber</p>
+			</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td style="border: none; padding: 0cm"><p><strong>Objetivo do OIDC</strong></p>
+			</td>
+			<td style="border: none; padding: 0cm"><p>Autenticar na nuvem sem
+				guardar uma credencial permanente de acesso.</p>
+			</td>
+		</tr>
+		<tr>
+			<td style="border: none; padding: 0cm"><p><strong><code class="western">id-token:
+				write</code></strong></p>
+			</td>
+			<td style="border: none; padding: 0cm"><p>Permite solicitar o JWT
+				OIDC; não concede permissão para alterar recursos na nuvem.</p>
+			</td>
+		</tr>
+		<tr>
+			<td style="border: none; padding: 0cm"><p><strong>Fluxo de
+				autenticação</strong></p>
+			</td>
+			<td style="border: none; padding: 0cm"><p>GitHub emite JWT →
+				provedor valida a confiança → fornece token temporário.</p>
+			</td>
+		</tr>
+		<tr>
+			<td style="border: none; padding: 0cm"><p><strong>Claims</strong></p>
+			</td>
+			<td style="border: none; padding: 0cm"><p><code class="western">iss</code>:
+				emissor; <code class="western">aud</code>: destinatário; <code class="western">sub</code>:
+				identidade/contexto autorizado.</p>
+			</td>
+		</tr>
+		<tr>
+			<td style="border: none; padding: 0cm"><p><strong>Confiança
+				federada</strong></p>
+			</td>
+			<td style="border: none; padding: 0cm"><p>Restringe quais
+				repositórios e contextos podem autenticar. Branch e environment
+				podem mudar o <code class="western">sub</code>.</p>
+			</td>
+		</tr>
+		<tr>
+			<td style="border: none; padding: 0cm"><p><strong>Autenticação ×
+				autorização</strong></p>
+			</td>
+			<td style="border: none; padding: 0cm"><p>Login pode funcionar e o
+				deploy falhar por falta de permissões, como Azure RBAC.</p>
+			</td>
+		</tr>
+		<tr>
+			<td style="border: none; padding: 0cm"><p><strong>Leitura do
+				workflow</strong></p>
+			</td>
+			<td style="border: none; padding: 0cm"><p>Identificar permissões,
+				action de login, inputs e uso de secrets.</p>
+			</td>
+		</tr>
+	</tbody>
+</table>
+<p><br/>
+<br/>
+
+</p>
+<p><strong>Para o exemplo Azure</strong>, entenda que <code class="western">azure/login</code>
+faz a troca e que Client ID, Tenant ID e Subscription ID identificam
+a configuração. Eles não são um client secret.</p>
+<p>Deixe em segundo plano a memorização dos caminhos do portal,
+todos os cliques, comandos administrativos e o script Python para
+inspecionar JWT. Eles ajudam na prática, mas não precisam ser seu
+centro de revisão.</p>
+<p>Minha sugestão: <strong>domine esses sete pontos, refaça o
+simulado e use o manual para uma execução prática quando puder.</strong>
+Essa é uma prioridade de estudo, não uma garantia sobre quais
+perguntas aparecerão no exame.</p>
+<p style="line-height: 100%; margin-bottom: 0cm"><br/>
+
+</p>
+</body>
+</html>

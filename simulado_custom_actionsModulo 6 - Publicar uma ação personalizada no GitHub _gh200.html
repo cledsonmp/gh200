@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulado Oficial: GH-200</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --surface: #ffffff;
+    --surface-2: #f3f2f1;
+    --border: #d1d1d1;
+    --border-soft: #e5e5e5;
+    --text: #201f1e;
+    --text-dim: #605e5c;
+    --text-faint: #8a8886;
+    --brand: #0078d4;
+    --brand-dark: #005a9e;
+    --ok: #107c10;
+    --ok-bg: #dff6dd;
+    --ok-border: #107c10;
+    --bad: #a4262c;
+    --bad-bg: #fde7e9;
+    --bad-border: #a4262c;
+    --mono: ui-monospace, "SFMono-Regular", "SF Mono", Consolas, monospace;
+    --sans: "Segoe UI", -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: #faf9f8;
+    color: var(--text);
+    font-family: var(--sans);
+    padding: 28px 14px 80px;
+    min-height: 100vh;
+  }
+
+  .wrap { max-width: 720px; margin: 0 auto; }
+
+  .exam-header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border-soft);
+    padding-bottom: 16px;
+    margin-bottom: 18px;
+  }
+  h1 {
+    font-size: 26px;
+    margin: 0 0 8px;
+    font-weight: 800;
+    color: var(--brand);
+  }
+  .exam-sub {
+    color: var(--text-dim);
+    font-size: 13.5px;
+    line-height: 1.55;
+    margin: 0;
+  }
+
+  .status-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 16px;
+  }
+  .status-item { font-size: 12.5px; color: var(--text-dim); }
+  .status-item b { color: var(--text); font-weight: 700; }
+  .score-pill {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 11px;
+    border-radius: 20px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+  .progress-track {
+    width: 100%;
+    height: 5px;
+    background: var(--border-soft);
+    border-radius: 4px;
+    margin-top: 10px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--brand);
+    border-radius: 4px;
+    transition: width 0.35s ease;
+  }
+
+  .q-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    opacity: 0.45;
+    transition: opacity 0.25s ease, border-color 0.25s ease;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  }
+  .q-card.active { opacity: 1; border-color: var(--brand); }
+  .q-card.done { opacity: 1; }
+  .q-card.done.correct { border-color: var(--ok-border); }
+  .q-card.done.incorrect { border-color: var(--bad-border); }
+
+  .q-body { padding: 20px 20px 18px; }
+  .q-prompt {
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.6;
+    margin: 0 0 16px;
+    color: var(--text);
+  }
+  .q-num {
+    color: var(--brand);
+    font-weight: 800;
+    margin-right: 4px;
+  }
+  .code-block {
+    display: block;
+    font-family: var(--mono);
+    background: #f6f6f6;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 10px 12px;
+    margin: 10px 0;
+    font-size: 12.5px;
+    color: #24292e;
+    white-space: pre;
+    overflow-x: auto;
+  }
+
+  .options { display: flex; flex-direction: column; gap: 9px; }
+  .opt {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    text-align: left;
+    width: 100%;
+    padding: 12px 14px;
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 13.5px;
+    line-height: 1.55;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .opt:hover:not(:disabled) {
+    border-color: var(--brand);
+    background: #f3f9fd;
+  }
+  .opt:disabled { cursor: default; }
+  .opt-radio {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    border: 2px solid var(--text-faint);
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .opt-radio::after {
+    content: "";
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    background: transparent;
+  }
+  .opt.correct-answer {
+    border-color: var(--ok-border);
+    background: var(--ok-bg);
+  }
+  .opt.correct-answer .opt-radio { border-color: var(--ok); }
+  .opt.correct-answer .opt-radio::after { background: var(--ok); }
+  .opt.wrong-answer {
+    border-color: var(--bad-border);
+    background: var(--bad-bg);
+  }
+  .opt.wrong-answer .opt-radio { border-color: var(--bad); }
+  .opt.wrong-answer .opt-radio::after { background: var(--bad); }
+  .opt.muted { opacity: 0.5; }
+
+  .explain {
+    margin-top: 14px;
+    padding: 14px 15px;
+    border-radius: 8px;
+    font-size: 13.5px;
+    line-height: 1.6;
+    display: none;
+  }
+  .explain.show { display: block; }
+  .explain.ok-box { background: var(--ok-bg); border: 1px solid var(--ok-border); }
+  .explain.bad-box { background: var(--bad-bg); border: 1px solid var(--bad-border); margin-top: 10px; }
+  .explain-tag {
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 6px;
+  }
+  .ok-box .explain-tag { color: var(--ok); }
+  .bad-box .explain-tag { color: var(--bad); }
+  .explain p { margin: 0; color: var(--text); }
+
+  .summary {
+    display: none;
+    background: var(--surface);
+    border: 1px solid var(--brand);
+    border-radius: 10px;
+    padding: 26px 22px;
+    margin-top: 18px;
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .summary.show { display: block; }
+  .summary-icon { font-size: 32px; margin-bottom: 8px; }
+  .summary-score {
+    font-family: var(--mono);
+    font-size: 34px;
+    font-weight: 800;
+    margin: 4px 0 2px;
+    color: var(--brand);
+  }
+  .summary-label { color: var(--text-dim); font-size: 12.5px; margin-bottom: 16px; font-weight: 600; letter-spacing: 0.03em; text-transform: uppercase; }
+  .summary-msg { font-size: 13.5px; color: var(--text); line-height: 1.6; max-width: 480px; margin: 0 auto 18px; }
+  .retry-btn {
+    font-size: 13px;
+    font-weight: 600;
+    color: #ffffff;
+    background: var(--brand);
+    border: none;
+    border-radius: 6px;
+    padding: 10px 20px;
+    cursor: pointer;
+  }
+  .retry-btn:hover { background: var(--brand-dark); }
+
+  @media (max-width: 480px) {
+    .status-bar { flex-direction: column; align-items: flex-start; gap: 6px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="exam-header">
+    <h1>Simulado Oficial: GH-200</h1>
+    <p class="exam-sub">Foco: tipos de actions, ações compostas, CLI setup action e depuração de actions JS/Docker.</p>
+
+    <div class="status-bar">
+      <div class="status-item">Questão <b id="cur-q">0</b> de <b>10</b></div>
+      <div class="score-pill">✓ <span id="score">0</span>/<span id="answered">0</span> corretas</div>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+  </div>
+
+  <div id="quiz-container"></div>
+
+  <div class="summary" id="summary">
+    <div class="summary-icon" id="summary-icon">🎯</div>
+    <div class="summary-score" id="summary-score">0/10</div>
+    <div class="summary-label">Resultado final</div>
+    <p class="summary-msg" id="summary-msg"></p>
+    <button class="retry-btn" onclick="restartQuiz()">↻ Refazer simulado</button>
+  </div>
+
+</div>
+
+<script>
+const QUESTIONS = [
+  {
+    prompt: "No exemplo do material, o action.yml de uma ação composta define:",
+    codeBlock: "outputs:\n  script-result:\n    value: ${{ steps.run-script.outputs.result }}",
+    options: [
+      "Da saída result de uma etapa específica dentro da própria ação composta, identificada pelo id run-script",
+      "Do valor de retorno da action.yml inteira, calculado automaticamente pelo GitHub",
+      "De uma variável de ambiente global definida no workflow que chama a ação composta",
+      "Do input node-version passado pelo workflow que invoca a ação composta"
+    ],
+    correct: 0,
+    why: "O valor de script-result vem especificamente de ${{ steps.run-script.outputs.result }} — a saída de uma etapa interna da própria ação composta, identificada pelo id run-script, e não de algo externo ao arquivo action.yml."
+  },
+  {
+    prompt: "Você quer referenciar uma ação composta que está armazenada em um repositório DIFERENTE do workflow que vai usá-la. Qual sintaxe de uses: é a correta, segundo o material, e como ela se diferencia da referência a uma ação composta no mesmo repositório?",
+    codeBlock: null,
+    options: [
+      "uses: ./.github/actions/my-composite-action, igual à referência de mesmo repositório, sem nenhuma diferença de sintaxe",
+      "uses: owner/repository/.github/actions/my-composite-action@v1, incluindo o proprietário, o nome do repositório e uma tag de versão — diferente da referência local, que usa apenas o caminho relativo (./)",
+      "uses: github.com/owner/repository/my-composite-action, com o domínio completo do GitHub incluído na URL",
+      "Não é possível referenciar uma ação composta de um repositório diferente; ela só pode ser usada dentro do mesmo repositório onde foi criada"
+    ],
+    correct: 1,
+    why: "O material mostra explicitamente essa diferença: dentro do mesmo repositório, usa-se uses: ./.github/actions/my-composite-action; de um repositório diferente, usa-se uses: owner/repository/.github/actions/my-composite-action@v1, com owner, repository e uma tag de versão."
+  },
+  {
+    prompt: "Comparando os arquivos que você faz commit e push para criar uma ação de JavaScript com os arquivos necessários para uma ação de contêiner Docker, qual arquivo aparece na lista de uma delas mas não na outra?",
+    codeBlock: null,
+    options: [
+      "action.yml aparece apenas na lista de ações Docker; ações JavaScript não usam esse arquivo",
+      "README.md é exigido apenas para ações Docker; ações JavaScript nunca precisam desse arquivo",
+      "package.json e package-lock.json aparecem na lista de ações JavaScript; Dockerfile e entrypoint.sh aparecem na lista de ações Docker — cada tipo tem arquivos específicos que o outro não usa",
+      "Ambas as listas de arquivos são idênticas, sem nenhuma diferença entre os dois tipos de ação"
+    ],
+    correct: 2,
+    why: "O material lista, para ações JavaScript: action.yml, index.js, node_modules, package.json, package-lock.json e README.md. Para ações Docker: action.yml, entrypoint.sh, Dockerfile e README.md. action.yml e README.md são comuns às duas, mas package.json/package-lock.json são exclusivos do JavaScript, e Dockerfile/entrypoint.sh são exclusivos do Docker."
+  },
+  {
+    prompt: "No exemplo do material sobre criar uma ação de configuração de CLI, o action.yml especifica:",
+    codeBlock: "runs:\n  using: \"node16\"\n  main: \"index.js\"",
+    options: [
+      "using define o nome da CLI a ser instalada; main define a versão do Node.js usada",
+      "using define o sistema operacional do executor; main define o diretório principal do repositório",
+      "using e main são sinônimos nesse contexto, ambos apontando para o mesmo arquivo index.js",
+      "using define que o código JavaScript roda usando Node.js 16; main define o arquivo de entrada que contém a lógica da ação"
+    ],
+    correct: 3,
+    why: "O material explica: \"por que executar usar: node16? Essa ação executa o código JavaScript usando Node.js 16\" — e main: \"index.js\" aponta para o arquivo que efetivamente contém a lógica da ação, o ponto de entrada do código."
+  },
+  {
+    prompt: "No script index.js do exemplo de configuração de CLI, a linha const version = core.getInput('version') || 'latest' é usada, mesmo o input version já tendo um default: \"latest\" definido no action.yml. O que essa linha faz?",
+    codeBlock: null,
+    options: [
+      "Ela recupera o valor do input version (que, se não informado no workflow, já viria como 'latest' do action.yml); o || 'latest' funciona como uma segurança adicional caso o valor recuperado seja vazio",
+      "Ela ignora completamente o valor definido no action.yml, sempre usando 'latest' como valor fixo",
+      "Ela sobrescreve o valor do action.yml permanentemente, alterando o arquivo de metadados em tempo de execução",
+      "Ela força o usuário a sempre informar um valor explícito para version, rejeitando o uso do default do action.yml"
+    ],
+    correct: 0,
+    why: "core.getInput('version') busca o valor do input, que normalmente já viria preenchido com 'latest' via o default do action.yml. O || 'latest' no código é uma camada extra de segurança no próprio JavaScript, garantindo um valor mesmo em cenários onde o input chegasse vazio."
+  },
+  {
+    prompt: "Durante a execução de uma ação JavaScript, você percebe que um input esperado está chegando como undefined dentro do código. Segundo a tabela de solução de problemas do material, qual é a causa provável e a correção sugerida?",
+    codeBlock: null,
+    options: [
+      "Causa: sintaxe ou erro de runtime em index.js; Correção: usar console.log() e verificar os logs",
+      "Causa: nome de entrada incorreto ou entrada ausente; Correção: verificar action.yml e como as entradas são passadas",
+      "Causa: core.exportVariable ou process.env não usado corretamente; Correção: examinar a configuração de código das variáveis",
+      "Causa: valores incorretos de key ou path; Correção: verificar a configuração e as chaves do cache"
+    ],
+    correct: 1,
+    why: "A tabela de solução de problemas do material associa \"as entradas são undefined\" à causa \"nome de entrada incorreto ou entrada ausente\", com a correção \"verificar action.yml e como as entradas são passadas\" — as demais opções descrevem outras linhas da mesma tabela, para sintomas diferentes."
+  },
+  {
+    prompt: "Sua ação JavaScript está tentando ler um arquivo usando um caminho relativo, mas recebe um erro de \"arquivo não encontrado\" durante a execução no executor. Segundo a tabela de solução de problemas do material, qual é a causa provável e a correção sugerida?",
+    codeBlock: null,
+    options: [
+      "Sintaxe ou erro de runtime em index.js; usar console.log() e verificar logs",
+      "Nome de entrada incorreto ou entrada ausente; verificar action.yml",
+      "Caminhos relativos ausentes; usar __dirname ou caminhos completos para arquivos",
+      "Valores incorretos de key ou path; verificar a configuração e as chaves do cache"
+    ],
+    correct: 2,
+    why: "A tabela do material associa \"arquivo não encontrado\" à causa \"caminhos relativos ausentes\", com a correção \"usar __dirname ou caminhos completos para arquivos\" — diferente das causas associadas a inputs undefined, erros de sintaxe, ou cache não restaurado."
+  },
+  {
+    prompt: "Comparando como um input with: name: test é exposto dentro de um contêiner Docker, e como a variável GITHUB_WORKSPACE é mapeada, segundo a tabela do material, qual associação está correta?",
+    codeBlock: null,
+    options: [
+      "with: name: test se torna GITHUB_WORKSPACE; INPUT_NAME=test é mapeado para o diretório de trabalho",
+      "Ambos se tornam exatamente a mesma variável de ambiente, INPUT_WORKSPACE",
+      "with: name: test não é acessível dentro de contêineres Docker, apenas em ações JavaScript",
+      "with: name: test se torna INPUT_NAME=test; GITHUB_WORKSPACE é mapeado para /github/workspace"
+    ],
+    correct: 3,
+    why: "A tabela de mapeamento de variáveis do material mostra exatamente essa correspondência: \"with: name: test\" vira \"INPUT_NAME=test\", e \"GITHUB_WORKSPACE\" é \"mapeado para /github/workspace\" — dois mapeamentos distintos, sem troca entre eles."
+  },
+  {
+    prompt: "Sua ação de contêiner Docker apresenta dois sintomas em execuções diferentes: em uma, um pacote necessário não é encontrado durante a execução do script; em outra, uma chamada a um serviço externo falha. Segundo a tabela de problemas comuns em ações Docker do material, quais são as causas prováveis de cada um, respectivamente?",
+    codeBlock: null,
+    options: [
+      "Dependências não instaladas ou configuradas incorretamente na imagem; e serviços externos não acessíveis (rede)",
+      "Ambos têm a mesma causa: ENTRYPOINT ou CMD configurado incorretamente",
+      "Permissão de execução ausente no script; e caminho de arquivo incorreto dentro do contêiner",
+      "Variáveis INPUT_ não acessadas; e ENTRYPOINT mal configurado"
+    ],
+    correct: 0,
+    why: "A tabela do material associa \"dependências ausentes\" à causa \"dependências não instaladas ou configuradas incorretamente\", e \"falhas relacionadas à rede\" à causa \"serviços externos não acessíveis\" — são duas linhas diferentes da mesma tabela, com causas específicas para cada sintoma."
+  },
+  {
+    prompt: "A ferramenta de CLI act é mencionada tanto na seção de ações JavaScript quanto na seção de ações de contêiner Docker do material. Qual é o propósito dela, e ele é específico de um único tipo de ação ou serve para ambos?",
+    codeBlock: null,
+    options: [
+      "Serve apenas para ações Docker, simulando exclusivamente a criação de imagens e contêineres",
+      "Simula o ambiente do GitHub Actions localmente, permitindo testar e depurar fluxos de trabalho antes do push — usada tanto para ações JavaScript quanto para ações Docker",
+      "Serve apenas para ações JavaScript, simulando exclusivamente a instalação de dependências Node.js",
+      "É uma ferramenta exclusiva para ações compostas, não mencionada em nenhum outro contexto do material"
+    ],
+    correct: 1,
+    why: "O material menciona act -j test na seção de ações JavaScript e act -j test-job na seção de ações Docker, ambas descrevendo a mesma finalidade: \"simula o ambiente do GitHub Actions em seu computador local, permitindo que você depure e valide o fluxo de trabalho antes de enviar alterações por push\" — não é uma ferramenta exclusiva de um único tipo de ação."
+  }
+];
+
+let current = 0;
+let score = 0;
+let answered = 0;
+const userAnswers = new Array(QUESTIONS.length).fill(null);
+
+const container = document.getElementById("quiz-container");
+
+function renderAll() {
+  container.innerHTML = "";
+  QUESTIONS.forEach((q, qi) => {
+    const card = document.createElement("div");
+    card.className = "q-card" + (qi === current ? " active" : "");
+    card.id = "card-" + qi;
+
+    let optsHtml = "";
+    q.options.forEach((opt, oi) => {
+      optsHtml += `<button class="opt" data-qi="${qi}" data-oi="${oi}">
+        <span class="opt-radio"></span>
+        <span>${opt}</span>
+      </button>`;
+    });
+
+    const codeHtml = q.codeBlock ? `<pre class="code-block">${q.codeBlock}</pre>` : "";
+
+    card.innerHTML = `
+      <div class="q-body">
+        <p class="q-prompt"><span class="q-num">${qi + 1}.</span>${q.prompt}</p>
+        ${codeHtml}
+        <div class="options">${optsHtml}</div>
+        <div class="explain ok-box" id="ok-explain-${qi}">
+          <span class="explain-tag">✓ Por que a resposta correta está certa</span>
+          <p>${q.why}</p>
+        </div>
+        <div class="explain bad-box" id="bad-explain-${qi}">
+          <span class="explain-tag">✕ Por que sua alternativa está errada</span>
+          <p id="bad-explain-text-${qi}"></p>
+        </div>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+
+  document.querySelectorAll(".opt").forEach(btn => {
+    btn.addEventListener("click", handleAnswer);
+  });
+
+  updateStatus();
+}
+
+function handleAnswer(e) {
+  const btn = e.currentTarget;
+  const qi = parseInt(btn.dataset.qi);
+  const oi = parseInt(btn.dataset.oi);
+
+  if (userAnswers[qi] !== null) return;
+
+  const q = QUESTIONS[qi];
+  const isCorrect = oi === q.correct;
+  userAnswers[qi] = oi;
+  answered++;
+  if (isCorrect) score++;
+
+  const card = document.getElementById("card-" + qi);
+  card.classList.remove("active");
+  card.classList.add("done", isCorrect ? "correct" : "incorrect");
+
+  const allOpts = card.querySelectorAll(".opt");
+  allOpts.forEach((o, idx) => {
+    o.disabled = true;
+    if (idx === q.correct) {
+      o.classList.add("correct-answer");
+    } else if (idx === oi && !isCorrect) {
+      o.classList.add("wrong-answer");
+    } else {
+      o.classList.add("muted");
+    }
+  });
+
+  document.getElementById("ok-explain-" + qi).classList.add("show");
+
+  if (!isCorrect) {
+    const badTextEl = document.getElementById("bad-explain-text-" + qi);
+    badTextEl.textContent = buildWrongExplanation(q, oi);
+    document.getElementById("bad-explain-" + qi).classList.add("show");
+  }
+
+  updateStatus();
+
+  const next = qi + 1;
+  if (next < QUESTIONS.length) {
+    current = next;
+    document.getElementById("card-" + next).classList.add("active");
+    setTimeout(() => {
+      document.getElementById("card-" + next).scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 250);
+  } else {
+    showSummary();
+  }
+}
+
+function buildWrongExplanation(q, chosenIdx) {
+  const chosenText = q.options[chosenIdx];
+  return "Você escolheu: \"" + chosenText + "\". Essa alternativa descreve algo real do material, só que associado a outra tabela, linha ou cenário — releia a explicação acima com atenção.";
+}
+
+function updateStatus() {
+  document.getElementById("cur-q").textContent = Math.min(answered + (answered < QUESTIONS.length ? 1 : 0), QUESTIONS.length);
+  document.getElementById("score").textContent = score;
+  document.getElementById("answered").textContent = answered;
+  const pct = (answered / QUESTIONS.length) * 100;
+  document.getElementById("progress-fill").style.width = pct + "%";
+}
+
+function showSummary() {
+  const pct = Math.round((score / QUESTIONS.length) * 100);
+  document.getElementById("summary-score").textContent = score + "/" + QUESTIONS.length;
+  let icon, msg;
+  if (pct >= 85) {
+    icon = "🟢";
+    msg = "Excelente! Você domina bem os tipos de actions, ações compostas, a action de CLI, e as tabelas de troubleshooting de JS e Docker.";
+  } else if (pct >= 60) {
+    icon = "🟡";
+    msg = "Bom resultado. Releia as explicações — várias questões aqui cruzam linhas específicas das tabelas de troubleshooting, então vale conferir qual causa vai com qual sintoma.";
+  } else {
+    icon = "🔴";
+    msg = "Vale reler o material sobre tipos de actions e as tabelas de troubleshooting (JS e Docker) com calma antes de refazer este simulado.";
+  }
+  document.getElementById("summary-icon").textContent = icon;
+  document.getElementById("summary-msg").textContent = msg;
+  document.getElementById("summary").classList.add("show");
+  setTimeout(() => {
+    document.getElementById("summary").scrollIntoView({ behavior: "smooth", block: "center" });
+  }, 300);
+}
+
+function restartQuiz() {
+  current = 0;
+  score = 0;
+  answered = 0;
+  userAnswers.fill(null);
+  document.getElementById("summary").classList.remove("show");
+  renderAll();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+renderAll();
+</script>
+</body>
+</html>
