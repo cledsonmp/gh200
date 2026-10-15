@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	<title></title>
+	<meta name="generator" content="LibreOffice 26.2.3.1 (Windows)"/>
+	<meta name="created" content="2026-10-12T21:16:07.077079100"/>
+	<meta name="changed" content="2026-10-15T15:18:28.334364800"/>
+	<style type="text/css">
+		@page { size: 21cm 29.7cm; margin: 2cm }
+		p { line-height: 115%; margin-bottom: 0.25cm; background: transparent }
+		pre { background: transparent }
+		pre.western { font-family: "Liberation Mono", monospace; font-size: 10pt }
+		pre.cjk { font-size: 10pt; font-family: "NSimSun", monospace }
+		pre.ctl { font-family: "Liberation Mono", monospace; font-size: 10pt }
+		h3 { margin-top: 0.25cm; margin-bottom: 0.21cm; background: transparent; page-break-after: avoid }
+		h3.western { font-family: "Liberation Serif", serif; font-weight: bold; font-size: 14pt }
+		h3.cjk { font-size: 14pt; font-family: "NSimSun"; font-weight: bold }
+		h3.ctl { font-family: "Lucida Sans"; font-size: 14pt; font-weight: bold }
+		code.western { font-family: "Liberation Mono", monospace }
+		code.cjk { font-family: "NSimSun", monospace }
+		code.ctl { font-family: "Liberation Mono", monospace }
+		a:link { color: #000080; text-decoration: underline }
+		a:visited { color: #800000; text-decoration: underline }
+	</style>
+</head>
+<body lang="pt-BR" link="#000080" vlink="#800000" dir="ltr"><p>Imagine
+que o seu projeto tem uma estrutura onde o código-fonte ou a
+aplicação Node.js está guardada dentro de uma pasta específica
+chamada <code class="western">backend</code>, e você quer que todos
+os comandos <code class="western">run</code> executem lá dentro por
+defeito.</p>
+<p>YAML</p>
+<pre class="western"><code class="western">name: Exemplo de Working Directory Padrão</code>
+
+
+<code class="western">on: [push]</code>
+
+<code class="western">jobs:</code>
+<code class="western">  </code><code class="western">construir:</code>
+<code class="western">    </code><code class="western">runs-on: ubuntu-latest</code>
+<code class="western">    </code>
+<code class="western">    </code><code class="western"><b># Definimos aqui o diretório padrão para todos os steps 'run' deste job</b></code>
+<code class="western">    </code><code class="western"><b>defaults:</b></code>
+<code class="western">      </code><code class="western"><b>run:</b></code>
+<code class="western">        </code><code class="western"><b>working-directory: ./backend</b></code>
+
+<code class="western">    </code><code class="western">steps:</code>
+<code class="western">      </code><code class="western">- name: Checkout do código</code>
+<code class="western">        </code><code class="western">uses: actions/checkout@v4</code>
+<code class="western">        </code><code class="western"># Nota: O checkout continua a ser feito na raiz do repositório por defeito</code>
+
+<code class="western">      </code><code class="western">- name: Instalar dependências</code>
+<code class="western">        </code><code class="western">run: npm install</code>
+<code class="western">        </code><code class="western"># Como definimos o defaults.run, este comando vai correr automaticamente dentro de './backend'</code>
+
+<code class="western">      </code><code class="western">- name: Executar testes</code>
+<code class="western">        </code><code class="western">run: npm test</code>
+<code class="western">        </code><code class="western"># Este step também correrá dentro de './backend' sem precisar de repetir o caminho</code></pre><h3 class="western">
+Detalhes Importantes para a Prova:</h3>
+<ul>
+	<li><p><b>Escopo:</b> O bloco <code class="western">defaults.run</code>
+	pode ser definido tanto a nível global (para o workflow inteiro,
+	antes dos jobs) quanto a nível individual (dentro de um job
+	específico).</p></li>
+	<li><p><b>Sobrescrita (</b><i><b>Override</b></i><b>):</b> Se por
+	acaso precisar que um step específico corra noutro sítio, cada
+	step <code class="western">run</code> individual ainda pode declarar
+	o seu próprio <code class="western">working-directory</code> para
+	ignorar o padrão definido.</p></li>
+	<li><p><b>Restrição:</b> Esta diretiva aplica-se exclusivamente a
+	passos do tipo <code class="western"><b>run</b></code> (comandos de
+	terminal), não afetando a execução de <i>actions</i> de terceiros
+	(como o <code class="western">actions/checkout</code>).</p></li>
+</ul>
+<p style="line-height: 100%; margin-bottom: 0cm"><br/>
+
+</p>
+</body>
+</html>

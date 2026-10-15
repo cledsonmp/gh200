@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simulado GH-200 – GitHub Actions #4</title>
+<style>
+:root{color-scheme:light}
+html,body{background:#fff;color:#1f2328;margin:0;font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif}
+main{max-width:760px;margin:0 auto;padding:24px 16px 60px}
+h1{font-size:22px;margin:0 0 4px}
+.sub{color:#59636e;margin:0 0 20px;font-size:14px}
+.q{border:1px solid #d1d9e0;border-radius:10px;padding:16px;margin-bottom:16px;background:#fff}
+.q h2{font-size:15px;margin:0 0 12px;line-height:1.45}
+.opt{display:block;width:100%;text-align:left;background:#fff;border:1px solid #d1d9e0;border-radius:8px;padding:10px 12px;margin:6px 0;font-size:14px;cursor:pointer;color:#1f2328;line-height:1.4}
+.opt:hover:not(:disabled){background:#f6f8fa}
+.opt:disabled{cursor:default}
+.opt.ok{background:#dafbe1;border-color:#1a7f37}
+.opt.bad{background:#ffebe9;border-color:#cf222e}
+.exp{display:none;margin-top:10px;padding:10px 12px;border-radius:8px;background:#f6f8fa;font-size:13.5px;line-height:1.5}
+code{background:#eaeef2;padding:1px 5px;border-radius:4px;font-size:12.5px}
+#score{display:none;text-align:center;font-size:18px;font-weight:600;padding:16px;border:2px solid #0969da;border-radius:10px}
+button.r{margin-top:12px;padding:8px 16px;border:1px solid #d1d9e0;background:#fff;border-radius:8px;cursor:pointer}
+</style></head><body><main>
+<h1>Simulado GH-200 · GitHub Actions #4</h1>
+<p class="sub">10 questões · clique na alternativa para ver a correção imediata.</p>
+<div id="qs"></div>
+<div id="score"></div>
+<script>
+const Q=[
+{q:"Como restringir quais repositórios de uma organização podem usar determinado conjunto de runners self-hosted?",
+o:["Usando labels diferentes em cada runner","Usando environments com required reviewers","Criando um runner group com acesso a repositórios selecionados","Definindo permissions no workflow"],a:2,
+e:"<b>Runner groups</b> controlam quem pode usar os runners (repositórios ou organizações selecionados). <b>Labels</b> apenas ajudam o job a escolher um runner, mas não restringem acesso."},
+{q:"Qual é o requisito correto para publicar uma action no GitHub Marketplace?",
+o:["Repositório público com um único action.yml na raiz, sem arquivos de workflow, e nome único","Repositório privado com action.yml em qualquer pasta","Repositório público com várias actions em subpastas, cada uma com seu action.yml","Aprovação prévia da equipe do GitHub"],a:0,
+e:"O repositório precisa ser público, ter um único arquivo de metadados na raiz e não conter arquivos de workflow. A publicação é feita ao criar uma release marcando \"Publish this Action to the GitHub Marketplace\". Não há aprovação prévia."},
+{q:"Qual opção do script de configuração do runner self-hosted faz com que ele execute apenas um job e se remova automaticamente?",
+o:["--oneshot","--single-job","--disposable","--ephemeral"],a:3,
+e:"Runners <code>--ephemeral</code> executam um job e são removidos, o que reduz o risco de contaminação entre execuções. Costumam ser combinados com autoescalonamento."},
+{q:"Qual comando cria uma anotação de erro associada a um arquivo e linha, visível no resumo da run e no PR?",
+o:["echo \"::set-error file=app.js,line=10::Mensagem\"","echo \"::error file=app.js,line=10::Mensagem\"","echo \"::annotate type=error file=app.js::Mensagem\"","echo \"::fail file=app.js,line=10::Mensagem\""],a:1,
+e:"Os workflow commands de anotação são <code>::error::</code>, <code>::warning::</code> e <code>::notice::</code>, com parâmetros como <code>file</code>, <code>line</code> e <code>title</code>. O <code>::error::</code> sozinho não faz o step falhar; ele só cria a anotação."},
+{q:"Como exibir um resumo em Markdown na página de resumo da execução do workflow?",
+o:["echo \"...\" >> $GITHUB_OUTPUT","echo \"::notice::...\"","echo \"...\" >> $GITHUB_STEP_SUMMARY","Subir um summary.md com upload-artifact"],a:2,
+e:"O conteúdo Markdown escrito em <code>$GITHUB_STEP_SUMMARY</code> aparece na aba de resumo da run. <code>GITHUB_OUTPUT</code> serve para outputs de step e <code>::notice::</code> cria uma anotação, não um resumo."},
+{q:"Qual condição executa um step apenas em um push para a branch main?",
+o:["github.event_name == 'push' && github.ref == 'refs/heads/main'","github.event_name == 'push' && github.ref_name == 'refs/heads/main'","github.branch == 'main'","github.event.ref == 'main'"],a:0,
+e:"<code>github.ref</code> vem completo (<code>refs/heads/main</code>), enquanto <code>github.ref_name</code> vem curto (<code>main</code>). Não existe <code>github.branch</code>."},
+{q:"Como definir um working-directory padrão para todos os steps <code>run</code> de um job?",
+o:["env: WORKING_DIR: ./app","with: working-directory: ./app no job","working-directory: ./app direto no job","defaults.run.working-directory: ./app"],a:3,
+e:"<code>defaults.run</code> (no workflow ou no job) define <code>shell</code> e <code>working-directory</code> padrão para steps <code>run</code>. Cada step ainda pode sobrescrever."},
+{q:"Se <code>timeout-minutes</code> não for definido, qual é o tempo limite padrão de um job?",
+o:["60 minutos","360 minutos","120 minutos","24 horas"],a:1,
+e:"O padrão é 360 minutos (6 horas). Ao atingir o limite, o job é cancelado. Definir um valor menor evita gastar minutos com jobs travados."},
+{q:"Quais permissões o job precisa para gerar uma attestation de proveniência de build (ex.: com actions/attest-build-provenance)?",
+o:["id-token: write e attestations: write","contents: write e packages: write","security-events: write","id-token: read e actions: read"],a:0,
+e:"A attestation é assinada com o token OIDC (<code>id-token: write</code>) e registrada com <code>attestations: write</code>. Ela permite verificar depois de onde e como o artefato foi construído."},
+{q:"Como exigir que um workflow específico passe em todos os PRs dos repositórios de uma organização?",
+o:["Criando um starter workflow na organização","Adicionando workflow_call em cada repositório","Usando um repository ruleset da organização com a regra \"Require workflows to pass before merging\"","Configurando um arquivo CODEOWNERS"],a:2,
+e:"Rulesets em nível de organização aplicam o workflow obrigatório a repositórios-alvo. Starter workflows são apenas sugestões e CODEOWNERS define revisores, não workflows."}
+];
+let hits=0,done=0;
+const box=document.getElementById('qs');
+Q.forEach((it,i)=>{
+ const d=document.createElement('div');d.className='q';
+ d.innerHTML='<h2>'+(i+1)+'. '+it.q+'</h2>';
+ const L='ABCD';
+ it.o.forEach((t,j)=>{
+  const b=document.createElement('button');b.className='opt';b.innerHTML='<b>'+L[j]+')</b> '+t;
+  b.onclick=()=>{
+   d.querySelectorAll('.opt').forEach((x,k)=>{x.disabled=true;if(k===it.a)x.classList.add('ok')});
+   if(j!==it.a)b.classList.add('bad');else hits++;
+   ex.style.display='block';
+   ex.innerHTML=(j===it.a?'✅ <b>Correto!</b> ':'❌ <b>Errado.</b> Resposta certa: <b>'+L[it.a]+'</b>. ')+it.e;
+   if(++done===Q.length){const s=document.getElementById('score');s.style.display='block';s.innerHTML='Você acertou '+hits+' de '+Q.length+' ('+Math.round(hits*10)+'%)<br><button class="r" onclick="location.reload()">Refazer</button>';s.scrollIntoView({behavior:'smooth'})}
+  };
+  d.appendChild(b);
+ });
+ const ex=document.createElement('div');ex.className='exp';d.appendChild(ex);
+ box.appendChild(d);
+});
+</script></main></body></html>

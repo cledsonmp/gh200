@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simulado GH-200 – GitHub Actions #3</title>
+<style>
+:root{color-scheme:light}
+html,body{background:#fff;color:#1f2328;margin:0;font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif}
+main{max-width:760px;margin:0 auto;padding:24px 16px 60px}
+h1{font-size:22px;margin:0 0 4px}
+.sub{color:#59636e;margin:0 0 20px;font-size:14px}
+.q{border:1px solid #d1d9e0;border-radius:10px;padding:16px;margin-bottom:16px;background:#fff}
+.q h2{font-size:15px;margin:0 0 12px;line-height:1.45}
+.opt{display:block;width:100%;text-align:left;background:#fff;border:1px solid #d1d9e0;border-radius:8px;padding:10px 12px;margin:6px 0;font-size:14px;cursor:pointer;color:#1f2328;line-height:1.4}
+.opt:hover:not(:disabled){background:#f6f8fa}
+.opt:disabled{cursor:default}
+.opt.ok{background:#dafbe1;border-color:#1a7f37}
+.opt.bad{background:#ffebe9;border-color:#cf222e}
+.exp{display:none;margin-top:10px;padding:10px 12px;border-radius:8px;background:#f6f8fa;font-size:13.5px;line-height:1.5}
+code{background:#eaeef2;padding:1px 5px;border-radius:4px;font-size:12.5px}
+#score{display:none;text-align:center;font-size:18px;font-weight:600;padding:16px;border:2px solid #0969da;border-radius:10px}
+button.r{margin-top:12px;padding:8px 16px;border:1px solid #d1d9e0;background:#fff;border-radius:8px;cursor:pointer}
+</style></head><body><main>
+<h1>Simulado GH-200 · GitHub Actions #3</h1>
+<p class="sub">10 questões · clique na alternativa para ver a correção imediata.</p>
+<div id="qs"></div>
+<div id="score"></div>
+<script>
+const Q=[
+{q:"Qual é o principal risco de usar um runner self-hosted em um repositório público?",
+o:["O custo de minutos fica ilimitado e sem controle","Um PR vindo de fork pode executar código arbitrário na sua infraestrutura","Runners self-hosted não suportam o evento pull_request","O limite de 20 jobs simultâneos é imposto automaticamente"],a:1,
+e:"Em repositório público, qualquer pessoa pode abrir um PR de fork cujo workflow pode rodar código no seu runner, que não é efêmero por padrão e pode acessar sua rede. Por isso o GitHub recomenda evitar self-hosted em repositórios públicos ou usar runners efêmeros e isolados."},
+{q:"Sua organização quer oferecer workflows modelo (starter workflows) que apareçam na aba Actions de todos os repositórios. Onde eles devem ficar?",
+o:["Em .github/workflows de cada repositório","Em um repositório chamado actions, na raiz","Na pasta .github/templates de cada repositório","No repositório .github da organização, na pasta workflow-templates"],a:3,
+e:"Starter workflows ficam no repositório <code>.github</code> da organização, dentro de <code>workflow-templates</code>, acompanhados de um arquivo <code>.properties.json</code> com os metadados."},
+{q:"Um workflow chama um reusable workflow e quer repassar todos os secrets disponíveis ao chamador, sem listá-los um a um. Como fazer?",
+o:["secrets: inherit","env: inherit","permissions: inherit","secrets: all"],a:0,
+e:"<code>secrets: inherit</code> no job chamador repassa todos os secrets (da mesma organização/empresa) ao reusable workflow. Os outros valores não existem."},
+{q:"Em uma composite action, qual propriedade é obrigatória em todo step que usa <code>run</code>?",
+o:["name","id","shell","working-directory"],a:2,
+e:"Em composite actions, cada step com <code>run</code> precisa declarar <code>shell</code> (ex.: <code>bash</code>), diferentemente de workflows comuns, onde há um padrão por runner."},
+{q:"Como acessar, em um workflow, uma configuration variable não sensível definida nas settings do repositório?",
+o:["${{ vars.NOME }}","${{ secrets.NOME }}","${{ env.NOME }} automaticamente","${{ config.NOME }}"],a:0,
+e:"Variáveis de configuração ficam no contexto <code>vars</code>. O contexto <code>env</code> só enxerga o que foi definido com <code>env:</code> no workflow, job ou step. <code>secrets</code> é para dados sensíveis."},
+{q:"Qual função de expressão é usada para gerar uma chave de cache baseada no conteúdo de arquivos como package-lock.json?",
+o:["contains()","format()","toJSON()","hashFiles()"],a:3,
+e:"<code>hashFiles('**/package-lock.json')</code> retorna um hash do conteúdo dos arquivos, de modo que a chave muda quando as dependências mudam."},
+{q:"Qual tipo de input de <code>workflow_dispatch</code> exibe uma lista de opções fixas para o usuário escolher?",
+o:["string com enum","choice","select","list"],a:1,
+e:"Os tipos suportados são <code>string</code>, <code>boolean</code>, <code>number</code>, <code>choice</code> e <code>environment</code>. O <code>choice</code> usa a propriedade <code>options</code> para definir a lista."},
+{q:"Como configurar o Dependabot para manter as versões das actions usadas nos seus workflows atualizadas?",
+o:["Em .github/dependabot.yml, com package-ecosystem: \"github-actions\"","Em .github/dependabot.yml, com package-ecosystem: \"actions\"","Em .github/dependabot.yml, com package-ecosystem: \"workflows\"","Em .github/dependabot.yml, com package-ecosystem: \"npm\" e directory: .github/workflows"],a:0,
+e:"O ecossistema correto é <code>github-actions</code>. Ele monitora as referências <code>uses:</code> nos workflows e abre PRs de atualização."},
+{q:"O job <code>A</code> foi ignorado (skipped) por causa de um <code>if</code>. O job <code>B</code> tem <code>needs: A</code> e nenhuma condição própria. O que acontece com <code>B</code>?",
+o:["B roda normalmente, pois skipped conta como sucesso","B falha com erro de dependência","B também é ignorado, pois há um success() implícito","B roda somente se A tiver continue-on-error"],a:2,
+e:"Sem <code>if</code>, o job recebe um <code>success()</code> implícito; como A não teve sucesso (foi skipped), B também é ignorado. Para rodar mesmo assim, use <code>if: always()</code> ou uma condição com <code>needs.A.result</code>."},
+{q:"Qual arquivo de metadados é obrigatório na raiz de uma action personalizada (JavaScript, Docker ou composite)?",
+o:["package.json","workflow.yml","action.json","action.yml (ou action.yaml)"],a:3,
+e:"A definição da action (inputs, outputs e <code>runs</code>) fica em <code>action.yml</code> ou <code>action.yaml</code>. O <code>package.json</code> pode existir em actions JavaScript, mas não é o arquivo de metadados."}
+];
+let hits=0,done=0;
+const box=document.getElementById('qs');
+Q.forEach((it,i)=>{
+ const d=document.createElement('div');d.className='q';
+ d.innerHTML='<h2>'+(i+1)+'. '+it.q+'</h2>';
+ const L='ABCD';
+ it.o.forEach((t,j)=>{
+  const b=document.createElement('button');b.className='opt';b.innerHTML='<b>'+L[j]+')</b> '+t;
+  b.onclick=()=>{
+   d.querySelectorAll('.opt').forEach((x,k)=>{x.disabled=true;if(k===it.a)x.classList.add('ok')});
+   if(j!==it.a)b.classList.add('bad');else hits++;
+   ex.style.display='block';
+   ex.innerHTML=(j===it.a?'✅ <b>Correto!</b> ':'❌ <b>Errado.</b> Resposta certa: <b>'+L[it.a]+'</b>. ')+it.e;
+   if(++done===Q.length){const s=document.getElementById('score');s.style.display='block';s.innerHTML='Você acertou '+hits+' de '+Q.length+' ('+Math.round(hits*10)+'%)<br><button class="r" onclick="location.reload()">Refazer</button>';s.scrollIntoView({behavior:'smooth'})}
+  };
+  d.appendChild(b);
+ });
+ const ex=document.createElement('div');ex.className='exp';d.appendChild(ex);
+ box.appendChild(d);
+});
+</script></main></body></html>

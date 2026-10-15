@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simulado GH-200 – GitHub Actions</title>
+<style>
+:root{color-scheme:light}
+html,body{background:#fff;color:#1f2328;margin:0;font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif}
+main{max-width:760px;margin:0 auto;padding:24px 16px 60px}
+h1{font-size:22px;margin:0 0 4px}
+.sub{color:#59636e;margin:0 0 20px;font-size:14px}
+.q{border:1px solid #d1d9e0;border-radius:10px;padding:16px;margin-bottom:16px;background:#fff}
+.q h2{font-size:15px;margin:0 0 12px;line-height:1.45}
+.opt{display:block;width:100%;text-align:left;background:#fff;border:1px solid #d1d9e0;border-radius:8px;padding:10px 12px;margin:6px 0;font-size:14px;cursor:pointer;color:#1f2328;line-height:1.4}
+.opt:hover:not(:disabled){background:#f6f8fa}
+.opt:disabled{cursor:default}
+.opt.ok{background:#dafbe1;border-color:#1a7f37}
+.opt.bad{background:#ffebe9;border-color:#cf222e}
+.exp{display:none;margin-top:10px;padding:10px 12px;border-radius:8px;background:#f6f8fa;font-size:13.5px;line-height:1.5}
+code{background:#eaeef2;padding:1px 5px;border-radius:4px;font-size:12.5px}
+#score{display:none;text-align:center;font-size:18px;font-weight:600;padding:16px;border:2px solid #0969da;border-radius:10px}
+button.r{margin-top:12px;padding:8px 16px;border:1px solid #d1d9e0;background:#fff;border-radius:8px;cursor:pointer}
+</style></head><body><main>
+<h1>Simulado GH-200 · GitHub Actions</h1>
+<p class="sub">10 questões · clique na alternativa para ver a correção imediata.</p>
+<div id="qs"></div>
+<div id="score"></div>
+<script>
+const Q=[
+{q:"Um workflow precisa rodar no contexto do branch base, com GITHUB_TOKEN de escrita e acesso a secrets, quando um PR é aberto a partir de um fork. Qual evento usar?",
+o:["pull_request","workflow_run","pull_request_target","pull_request_review"],a:2,
+e:"<code>pull_request_target</code> executa no contexto do branch base. Já <code>pull_request</code> vindo de fork recebe token somente leitura e sem secrets. Cuidado: nunca faça checkout e execute código não confiável do PR nesse evento. <code>workflow_run</code> dispara após outro workflow terminar, não na abertura do PR."},
+{q:"Existe um secret chamado <code>API_KEY</code> definido na organização, no repositório e em um environment <code>production</code>. Um job usa <code>environment: production</code>. Qual valor ele recebe?",
+o:["O da organização","O do environment","O do repositório","Ocorre erro por conflito de nomes"],a:1,
+e:"Prevalece o secret de menor escopo: environment &gt; repositório &gt; organização. Não há erro de conflito."},
+{q:"Qual configuração torna um workflow reutilizável, para que outro workflow o chame com <code>jobs.&lt;id&gt;.uses</code>?",
+o:["on: workflow_dispatch","on: repository_dispatch","on: workflow_run","on: workflow_call"],a:3,
+e:"O gatilho <code>workflow_call</code> permite que o workflow seja chamado por outros. Os demais disparam por ação manual, evento externo via API ou conclusão de outro workflow."},
+{q:"Seguindo o princípio do menor privilégio, qual é a forma correta de permitir que um job apenas crie uma release e envie tags?",
+o:["permissions: contents: write (no job)","permissions: write-all","permissions: releases: write","permissions: actions: write"],a:0,
+e:"Criar release/tag exige <code>contents: write</code>. <code>write-all</code> funciona, mas viola o menor privilégio. <code>releases</code> não é um escopo válido e <code>actions: write</code> cuida de outras operações (ex.: cancelar runs)."},
+{q:"Com <code>actions/cache</code>, nenhuma chave bate exatamente com <code>key</code>. Qual parâmetro permite restaurar um cache parcialmente compatível?",
+o:["fallback-keys","path-prefix","restore-keys","lookup-only"],a:2,
+e:"<code>restore-keys</code> lista prefixos tentados em ordem quando não há correspondência exata. Os outros nomes não existem ou têm outra função (<code>lookup-only</code> apenas verifica se o cache existe, sem baixar)."},
+{q:"Como passar um valor calculado em um job para outro job do mesmo workflow?",
+o:["Gravar em $GITHUB_ENV e ler <code>env.VALOR</code> no outro job","Declarar <code>outputs</code> no job (mapeando o output de um step) e ler <code>needs.&lt;job&gt;.outputs.VALOR</code>","Ler <code>steps.&lt;id&gt;.outputs.VALOR</code> diretamente no outro job","Usar <code>jobs.&lt;job&gt;.outputs.VALOR</code> sem declarar <code>needs</code>"],a:1,
+e:"Cada job roda em runner separado. Os dados passam por <code>outputs</code> do job + <code>needs</code>. <code>$GITHUB_ENV</code> vale só dentro do mesmo job e o contexto <code>steps</code> não é visível em outros jobs."},
+{q:"Em um job com <code>strategy.matrix</code>, uma combinação falhou e as demais foram canceladas. Como fazer todas as combinações continuarem executando?",
+o:["max-parallel: 1","if: always() no job","continue-on-error: false","strategy.fail-fast: false"],a:3,
+e:"Por padrão <code>fail-fast</code> é <code>true</code> e cancela as outras execuções da matriz. Definir <code>fail-fast: false</code> resolve. <code>max-parallel</code> só limita concorrência."},
+{q:"Como exigir aprovação manual antes de um job de deploy rodar?",
+o:["Configurar um environment com required reviewers e referenciá-lo com <code>environment: production</code> no job","Usar <code>needs: [approval]</code> apontando para um job vazio","Criar uma branch protection rule exigindo reviewers","Adicionar um input booleano em <code>workflow_dispatch</code>"],a:0,
+e:"Environments com regras de proteção (required reviewers, wait timer) pausam o job até a aprovação. <code>needs</code> só define ordem, e branch protection atua em merges, não em jobs."},
+{q:"Você quer autenticar na nuvem via OIDC, sem guardar credenciais de longa duração. Qual permissão o job precisa?",
+o:["contents: read","security-events: write","id-token: write","packages: write"],a:2,
+e:"<code>id-token: write</code> permite solicitar o token OIDC do GitHub, que a nuvem valida com uma relação de confiança."},
+{q:"Qual tipo de ação personalizada só pode ser executado em runners Linux?",
+o:["JavaScript","Docker container","Composite","Todas rodam em Linux, Windows e macOS"],a:1,
+e:"Ações de container Docker exigem runners Linux. Ações JavaScript e composite rodam em todos os sistemas operacionais."}
+];
+let hits=0,done=0;
+const box=document.getElementById('qs');
+Q.forEach((it,i)=>{
+ const d=document.createElement('div');d.className='q';
+ d.innerHTML='<h2>'+(i+1)+'. '+it.q+'</h2>';
+ const L='ABCD';
+ it.o.forEach((t,j)=>{
+  const b=document.createElement('button');b.className='opt';b.innerHTML='<b>'+L[j]+')</b> '+t;
+  b.onclick=()=>{
+   d.querySelectorAll('.opt').forEach((x,k)=>{x.disabled=true;if(k===it.a)x.classList.add('ok')});
+   if(j!==it.a)b.classList.add('bad');else hits++;
+   ex.style.display='block';
+   ex.innerHTML=(j===it.a?'✅ <b>Correto!</b> ':'❌ <b>Errado.</b> Resposta certa: <b>'+L[it.a]+'</b>. ')+it.e;
+   if(++done===Q.length){const s=document.getElementById('score');s.style.display='block';s.innerHTML='Você acertou '+hits+' de '+Q.length+' ('+Math.round(hits*10)+'%)<br><button class="r" onclick="location.reload()">Refazer</button>';s.scrollIntoView({behavior:'smooth'})}
+  };
+  d.appendChild(b);
+ });
+ const ex=document.createElement('div');ex.className='exp';d.appendChild(ex);
+ box.appendChild(d);
+});
+</script></main></body></html>

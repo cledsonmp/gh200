@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	<title></title>
+	<meta name="generator" content="LibreOffice 26.2.3.1 (Windows)"/>
+	<meta name="created" content="2026-10-11T14:22:29.451772900"/>
+	<meta name="changed" content="2026-10-11T14:25:04.666071500"/>
+	<style type="text/css">
+		@page { size: 21cm 29.7cm; margin: 2cm }
+		p { line-height: 115%; margin-bottom: 0.25cm; background: transparent }
+		h3 { margin-top: 0.25cm; margin-bottom: 0.21cm; background: transparent; page-break-after: avoid }
+		h3.western { font-family: "Liberation Serif", serif; font-weight: bold; font-size: 14pt }
+		h3.cjk { font-size: 14pt; font-family: "NSimSun"; font-weight: bold }
+		h3.ctl { font-family: "Lucida Sans"; font-size: 14pt; font-weight: bold }
+		code.western { font-family: "Liberation Mono", monospace }
+		code.cjk { font-family: "NSimSun", monospace }
+		code.ctl { font-family: "Liberation Mono", monospace }
+		a:link { color: #000080; text-decoration: underline }
+		a:visited { color: #800000; text-decoration: underline }
+	</style>
+</head>
+<body lang="pt-BR" link="#000080" vlink="#800000" dir="ltr"><h3 class="western">
+Os Pilares Teóricos da Publicação no Marketplace</h3>
+<p><br/>
+<br/>
+
+</p>
+<p style="margin-bottom: 0cm"><a name="p-rc_2b568d7c3066e9d8-105"></a>
+Para que uma Action desenvolvida por você saia do seu repositório
+privado ou público e passe a ficar disponível para a comunidade no
+Marketplace do GitHub, o processo exige o cumprimento de passos
+administrativos e de segurança bem específicos definidos pela
+plataforma: 
+</p>
+<p style="orphans: 20">PNG</p>
+<ol>
+	<li><p><b>Repositório Público e Metadados Corretos:</b> O
+	repositório precisa ser público e conter obrigatoriamente o
+	ficheiro de metadados (<code class="western">action.yml</code> ou
+	<code class="western">action.yaml</code>) na raiz, preenchido
+	corretamente com nome, descrição, ícone e cor (usados na vitrine
+	do Marketplace).</p></li>
+	<li><p style="margin-bottom: 0cm"><a name="p-rc_2b568d7c3066e9d8-106"></a>
+	<b>Criação de uma Release com Tag (Semantic Versioning):</b> O
+	GitHub Marketplace está diretamente atrelado ao sistema de <b>Releases</b>
+	e <b>Git Tags</b> (ex: <code class="western">v1.0.0</code>). A
+	publicação de uma action não acontece de forma automática por
+	comandos de upload ou issues; ela é oficialmente disparada quando
+	você cria uma nova release no repositório. 
+	</p>
+	<p style="orphans: 20">PNG</p></li>
+	<li><p style="margin-bottom: 0cm"><a name="p-rc_2b568d7c3066e9d8-107"></a>
+	<b>A Caixa de Seleção (</b><i><b>Publish this Action to the GitHub
+	Marketplace</b></i><b>):</b> Ao preencher os dados para criar a
+	release no painel do GitHub, existe uma caixa de seleção
+	específica para marcar se você deseja listar aquela action no
+	Marketplace. Se houver algum erro nos metadados do seu <code class="western">action.yml</code>,
+	o GitHub exibirá um alerta nessa mesma tela impedindo a marcação
+	até que seja corrigido. 
+	</p>
+	<p style="orphans: 20">PNG</p></li>
+	<li><p style="margin-bottom: 0cm"><a name="p-rc_2b568d7c3066e9d8-108"></a>
+	<b>Requisitos de Segurança Obrigatórios (2FA):</b> Como medida de
+	segurança contra sequestro de contas e injeção de código
+	malicioso em cadeias de suprimentos (<i>supply chain attacks</i>), o
+	autor é obrigado a ter a <b>Autenticação de Dois Fatores (2FA)</b>
+	ativa na sua conta do GitHub para conseguir publicar qualquer item
+	no Marketplace. 
+	</p>
+	<p style="orphans: 20">PNG</p></li>
+	<li><p style="margin-bottom: 0cm"><a name="p-rc_2b568d7c3066e9d8-109"></a>
+	<b>O Mito da &quot;Certificação&quot; (Cuidado com pegadinhas de
+	prova!):</b> Um detalhe muito cobrado em exames é que <b>o facto de
+	uma action estar listada no Marketplace NÃO significa que ela foi
+	revisada, testada ou certificada pelo GitHub</b> em termos de
+	segurança. A listagem é aberta aos autores desde que atendam aos
+	requisitos formais, cabendo aos utilizadores avaliar a
+	confiabilidade do código de terceiros. 
+	</p>
+	<p style="margin-bottom: 0cm"></p></li>
+</ol>
+<p>Se a sua action for utilizada apenas de forma interna (dentro do
+seu próprio repositório ou de outros repositórios privados da sua
+organização via referência direta por URL do Git, como <code class="western">uses:
+seu-usuario/seu-repo/.github/actions/minha-action@main</code>), a
+secção de <code class="western">branding</code> (com o ícone e a
+cor) é totalmente <b>opcional</b>.</p>
+<p>No entanto, se você tentar marcar a caixa de publicação para o
+<b>GitHub Marketplace</b> ao criar uma <i>release</i>, o GitHub
+valida os metadados do seu ficheiro <code class="western">action.yml</code>
+e rejeita a publicação caso o <code class="western">branding</code>
+(com <code class="western">icon</code> e <code class="western">color</code>)
+esteja em falta.</p>
+<p style="line-height: 100%; margin-bottom: 0cm"><br/>
+
+</p>
+</body>
+</html>
