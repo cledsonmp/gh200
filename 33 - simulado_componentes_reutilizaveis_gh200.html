@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulado Modulo 7 - 33 - Gerenciar e aproveitar componentes reutilizáveis: GH-200</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --surface: #ffffff;
+    --surface-2: #f3f2f1;
+    --border: #d1d1d1;
+    --border-soft: #e5e5e5;
+    --text: #201f1e;
+    --text-dim: #605e5c;
+    --text-faint: #8a8886;
+    --brand: #0078d4;
+    --brand-dark: #005a9e;
+    --ok: #107c10;
+    --ok-bg: #dff6dd;
+    --ok-border: #107c10;
+    --bad: #a4262c;
+    --bad-bg: #fde7e9;
+    --bad-border: #a4262c;
+    --mono: ui-monospace, "SFMono-Regular", "SF Mono", Consolas, monospace;
+    --sans: "Segoe UI", -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: #faf9f8;
+    color: var(--text);
+    font-family: var(--sans);
+    padding: 28px 14px 80px;
+    min-height: 100vh;
+  }
+
+  .wrap { max-width: 720px; margin: 0 auto; }
+
+  .exam-header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border-soft);
+    padding-bottom: 16px;
+    margin-bottom: 18px;
+  }
+  h1 {
+    font-size: 26px;
+    margin: 0 0 8px;
+    font-weight: 800;
+    color: var(--brand);
+  }
+  .exam-sub {
+    color: var(--text-dim);
+    font-size: 13.5px;
+    line-height: 1.55;
+    margin: 0;
+  }
+
+  .status-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 16px;
+  }
+  .status-item { font-size: 12.5px; color: var(--text-dim); }
+  .status-item b { color: var(--text); font-weight: 700; }
+  .score-pill {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 11px;
+    border-radius: 20px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+  .progress-track {
+    width: 100%;
+    height: 5px;
+    background: var(--border-soft);
+    border-radius: 4px;
+    margin-top: 10px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--brand);
+    border-radius: 4px;
+    transition: width 0.35s ease;
+  }
+
+  .q-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    opacity: 0.45;
+    transition: opacity 0.25s ease, border-color 0.25s ease;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  }
+  .q-card.active { opacity: 1; border-color: var(--brand); }
+  .q-card.done { opacity: 1; }
+  .q-card.done.correct { border-color: var(--ok-border); }
+  .q-card.done.incorrect { border-color: var(--bad-border); }
+
+  .q-body { padding: 20px 20px 18px; }
+  .q-prompt {
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.6;
+    margin: 0 0 16px;
+    color: var(--text);
+  }
+  .q-num {
+    color: var(--brand);
+    font-weight: 800;
+    margin-right: 4px;
+  }
+  .options { display: flex; flex-direction: column; gap: 9px; }
+  .opt {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    text-align: left;
+    width: 100%;
+    padding: 12px 14px;
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 13.5px;
+    line-height: 1.55;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .opt:hover:not(:disabled) {
+    border-color: var(--brand);
+    background: #f3f9fd;
+  }
+  .opt:disabled { cursor: default; }
+  .opt-radio {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    border: 2px solid var(--text-faint);
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .opt-radio::after {
+    content: "";
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    background: transparent;
+  }
+  .opt.correct-answer {
+    border-color: var(--ok-border);
+    background: var(--ok-bg);
+  }
+  .opt.correct-answer .opt-radio { border-color: var(--ok); }
+  .opt.correct-answer .opt-radio::after { background: var(--ok); }
+  .opt.wrong-answer {
+    border-color: var(--bad-border);
+    background: var(--bad-bg);
+  }
+  .opt.wrong-answer .opt-radio { border-color: var(--bad); }
+  .opt.wrong-answer .opt-radio::after { background: var(--bad); }
+  .opt.muted { opacity: 0.5; }
+
+  .explain {
+    margin-top: 14px;
+    padding: 14px 15px;
+    border-radius: 8px;
+    font-size: 13.5px;
+    line-height: 1.6;
+    display: none;
+  }
+  .explain.show { display: block; }
+  .explain.ok-box { background: var(--ok-bg); border: 1px solid var(--ok-border); }
+  .explain.bad-box { background: var(--bad-bg); border: 1px solid var(--bad-border); margin-top: 10px; }
+  .explain-tag {
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 6px;
+  }
+  .ok-box .explain-tag { color: var(--ok); }
+  .bad-box .explain-tag { color: var(--bad); }
+  .explain p { margin: 0; color: var(--text); }
+
+  .summary {
+    display: none;
+    background: var(--surface);
+    border: 1px solid var(--brand);
+    border-radius: 10px;
+    padding: 26px 22px;
+    margin-top: 18px;
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .summary.show { display: block; }
+  .summary-icon { font-size: 32px; margin-bottom: 8px; }
+  .summary-score {
+    font-family: var(--mono);
+    font-size: 34px;
+    font-weight: 800;
+    margin: 4px 0 2px;
+    color: var(--brand);
+  }
+  .summary-label { color: var(--text-dim); font-size: 12.5px; margin-bottom: 16px; font-weight: 600; letter-spacing: 0.03em; text-transform: uppercase; }
+  .summary-msg { font-size: 13.5px; color: var(--text); line-height: 1.6; max-width: 480px; margin: 0 auto 18px; }
+  .retry-btn {
+    font-size: 13px;
+    font-weight: 600;
+    color: #ffffff;
+    background: var(--brand);
+    border: none;
+    border-radius: 6px;
+    padding: 10px 20px;
+    cursor: pointer;
+  }
+  .retry-btn:hover { background: var(--brand-dark); }
+
+  @media (max-width: 480px) {
+    .status-bar { flex-direction: column; align-items: flex-start; gap: 6px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="exam-header">
+    <h1>Simulado Modulo 7 - 33 - Gerenciar e aproveitar componentes reutilizáveis: GH-200</h1>
+    <p class="exam-sub">Módulo 7 — Gerenciar e aproveitar componentes reutilizáveis: tipos, nomenclatura, versionamento, segurança e distribuição.</p>
+
+    <div class="status-bar">
+      <div class="status-item">Questão <b id="cur-q">0</b> de <b>10</b></div>
+      <div class="score-pill">✓ <span id="score">0</span>/<span id="answered">0</span> corretas</div>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+  </div>
+
+  <div id="quiz-container"></div>
+
+  <div class="summary" id="summary">
+    <div class="summary-icon" id="summary-icon">🎯</div>
+    <div class="summary-score" id="summary-score">0/10</div>
+    <div class="summary-label">Resultado final</div>
+    <p class="summary-msg" id="summary-msg"></p>
+    <button class="retry-btn" onclick="restartQuiz()">↻ Refazer simulado</button>
+  </div>
+
+</div>
+
+<script>
+const QUESTIONS = [
+  {
+    prompt: "Segundo o painel sobre tipos de componentes reutilizáveis, qual é o exemplo específico dado para \"scripts compartilhados\", e como ele se diferencia do exemplo dado para \"ações personalizadas do GitHub\"?",
+    options: [
+      "Scripts compartilhados: gerar relatórios de conformidade (ex: Bash/PowerShell/Python); ações personalizadas: uma ação para linting de código",
+      "Scripts compartilhados: build e deploy padrão; ações personalizadas: gerar relatórios de conformidade",
+      "Ambos os exemplos são idênticos, sem diferenciação real entre os dois tipos",
+      "Scripts compartilhados: uma ação para linting de código; ações personalizadas: gerar relatórios de conformidade"
+    ],
+    correct: 0,
+    why: "O painel associa scripts compartilhados a \"scripts Bash, PowerShell ou Python usados em workflows\", com exemplo \"gerar relatórios de conformidade\"; já ações personalizadas são \"criadas para tarefas repetidas\", com exemplo \"ação para linting de código\" — exemplos distintos para cada tipo."
+  },
+  {
+    prompt: "Sua empresa está organizando repositórios centralizados para componentes reutilizáveis. Segundo a tabela do material, qual nome de exemplo corresponde especificamente ao repositório que \"contém workflows reutilizáveis (CI/CD)\"?",
+    options: [
+      "org-actions-repo",
+      "org-reusable-workflows",
+      "org-scripts-library",
+      "my-random-actions"
+    ],
+    correct: 1,
+    why: "A tabela associa \"Repositório de fluxos de trabalho\" (finalidade: contém workflows reutilizáveis de CI/CD) ao nome de exemplo \"org-reusable-workflows\" — diferente de org-actions-repo (ações) e org-scripts-library (scripts)."
+  },
+  {
+    prompt: "Segundo as convenções de nomenclatura do material, qual é o formato recomendado para nomear workflows e ações, e qual exemplo corresponde a \"implantação\"?",
+    options: [
+      "Formato [purpose]-[scope]; ci-test.yml corresponde a implantação",
+      "Formato PascalCase obrigatório; build-container.yml corresponde a implantação",
+      "Formato [scope]-[purpose]; deploy-app.yml corresponde a implantação",
+      "Não há formato recomendado; qualquer nome de arquivo é aceitável"
+    ],
+    correct: 2,
+    why: "O material recomenda o formato \"[scope]-[purpose]\", com o exemplo específico \"deploy-app.yml → implantação\" — diferente de ci-test.yml (testes de CI) e build-container.yml (contêineres), que correspondem a outros propósitos na mesma lista."
+  },
+  {
+    prompt: "Sua equipe lança uma nova versão de uma ação reutilizável que corrige um bug, sem adicionar novos recursos nem quebrar compatibilidade. Segundo o versionamento semântico do material, qual tipo de atualização de versão isso representa, e qual seria um exemplo de número de versão correspondente?",
+    options: [
+      "Atualização principal, de v1.0.0 para v2.0.0",
+      "Atualização secundária, de v1.0.0 para v1.1.0",
+      "Nenhuma atualização de versão é necessária para correções de bugs",
+      "Atualização de patch, de v1.0.0 para v1.0.1"
+    ],
+    correct: 3,
+    why: "O material define \"Patch: v1.0.1 → corrige bugs\" — exatamente o cenário descrito. Atualização secundária (v1.1.0) é para novos recursos compatíveis, e atualização principal (v2.0.0) é para alterações que quebram compatibilidade — nenhum dos dois se aplica a uma simples correção de bug."
+  },
+  {
+    prompt: "No exemplo do material sobre controle de versão, qual é a prática recomendada ao referenciar uma ação em um workflow, e qual é especificamente desaconselhada?",
+    options: [
+      "uses: org-actions-repo/setup-node@v1.2.0 (versão estável) é recomendado; usar @latest deve ser evitado",
+      "uses: org-actions-repo/setup-node@latest é a prática recomendada; usar uma versão estável como @v1.2.0 deve ser evitado",
+      "Ambas as práticas são igualmente recomendadas, sem preferência entre elas",
+      "O material não aborda esse tipo de comparação entre versões"
+    ],
+    correct: 0,
+    why: "O exemplo do material mostra \"# Evite uses: org-actions-repo/setup-node@latest\" e \"# Use uma versão estável uses: org-actions-repo/setup-node@v1.2.0\" — a recomendação é clara: usar uma versão fixa e estável, evitando a tag latest."
+  },
+  {
+    prompt: "Segundo o painel sobre automatizar atualizações, quais são as duas práticas recomendadas especificamente citadas pelo material?",
+    options: [
+      "Configurar CODEOWNERS e exigir revisões de código",
+      "Implementar uma ação para testar workflows e ações antes de mesclar, e usar Dependabot para dependências desatualizadas",
+      "Usar versionamento semântico e evitar a tag latest",
+      "Notificar antes de remover versões antigas e oferecer guias de migração"
+    ],
+    correct: 1,
+    why: "O painel \"Automatizando atualizações\" lista especificamente: \"implemente uma ação para testar workflows e ações antes de mesclar\" e \"use Dependabot para dependências desatualizadas\" — as demais opções pertencem a outros painéis do material (segurança, versionamento, manutenção)."
+  },
+  {
+    prompt: "Cada repositório de componentes reutilizáveis deve incluir três arquivos de documentação específicos, segundo o material. Quais são eles, e qual é o propósito do CHANGELOG.md entre eles?",
+    options: [
+      "README.md, LICENSE.md e CONTRIBUTING.md; o LICENSE.md documenta o histórico de versões",
+      "CHANGELOG.md, action.yml e Dockerfile; o action.yml documenta o histórico de versões",
+      "README.md, CHANGELOG.md e CONTRIBUTING.md; o CHANGELOG.md documenta o histórico de versões",
+      "Apenas README.md é mencionado como obrigatório; os demais são opcionais"
+    ],
+    correct: 2,
+    why: "O material lista: \"README.md (finalidade, como usar, exemplos), CHANGELOG.md (histórico de versões), CONTRIBUTING.md (diretrizes de contribuição)\" — o CHANGELOG.md é especificamente o arquivo responsável pelo histórico de versões, não o action.yml nem o LICENSE.md."
+  },
+  {
+    prompt: "Segundo o painel sobre controle de segurança e acesso, quais três medidas específicas o material recomenda para repositórios de ações?",
+    options: [
+      "Permitir apenas ações verificadas pelo GitHub, bloquear ações externas, e criar uma lista de permissões",
+      "Usar versionamento semântico, evitar a tag latest, e documentar em CHANGELOG.md",
+      "Configurar issues e discussions, notificar antes de remover versões, e oferecer guias de migração",
+      "Restringir o acesso de gravação, exigir revisões de código e CODEOWNERS, e usar escaneamento de segredos do GitHub"
+    ],
+    correct: 3,
+    why: "O painel de controle de segurança e acesso lista: \"restrinja o acesso de gravação a repositórios de ações\", \"exija revisões de código e CODEOWNERS\", e \"use escaneamento de segredos do GitHub\" — essas três medidas específicas, distintas das opções de restrição de ações externas ou das práticas de manutenção listadas em outros painéis."
+  },
+  {
+    prompt: "Sua empresa quer distribuir uma ação conteinerizada (empacotada como imagem Docker) para uso interno seguro, com autenticação necessária. Qual dos três métodos principais de distribuição, segundo a tabela de comparação do material, corresponde a esse caso de uso?",
+    options: [
+      "Pacotes do GitHub, cujo caso de uso é especificamente \"uso interno seguro\" com \"autenticação necessária\"",
+      "Repositórios de propriedade da organização, já que todo uso interno deve passar por esse método",
+      "GitHub Marketplace, pois é o único método que suporta ações conteinerizadas",
+      "Nenhum dos três métodos suporta ações conteinerizadas; elas exigem um registro externo separado"
+    ],
+    correct: 0,
+    why: "A tabela de comparação associa \"Pacotes do GitHub (contêineres)\" ao caso de uso \"uso interno seguro\", com segurança descrita como \"autenticação necessária\" — diferente do GitHub Marketplace (distribuição pública, sem restrições) ou dos repositórios da organização (uso interno via equipes e funções, sem foco específico em contêineres)."
+  },
+  {
+    prompt: "Comparando o controle de acesso entre o GitHub Marketplace e os repositórios de propriedade da organização, segundo a tabela de comparação do material, qual é a diferença?",
+    options: [
+      "Ambos os métodos usam exatamente o mesmo sistema de controle de acesso baseado em equipes",
+      "GitHub Marketplace não tem restrições de acesso (distribuição pública); repositórios da organização usam controle de acesso por equipes e funções",
+      "GitHub Marketplace exige autenticação obrigatória; repositórios da organização não têm nenhum controle de acesso",
+      "Repositórios da organização não têm nenhuma forma de restringir acesso, sendo sempre públicos como o Marketplace"
+    ],
+    correct: 1,
+    why: "A tabela de comparação lista, para controle de acesso: GitHub Marketplace = \"sem restrições\"; repositórios da organização = \"equipes e funções\" — uma diferença clara entre um método de distribuição pública irrestrita e outro com controle de acesso baseado em papéis organizacionais."
+  }
+];
+
+let current = 0;
+let score = 0;
+let answered = 0;
+const userAnswers = new Array(QUESTIONS.length).fill(null);
+
+const container = document.getElementById("quiz-container");
+
+function renderAll() {
+  container.innerHTML = "";
+  QUESTIONS.forEach((q, qi) => {
+    const card = document.createElement("div");
+    card.className = "q-card" + (qi === current ? " active" : "");
+    card.id = "card-" + qi;
+
+    let optsHtml = "";
+    q.options.forEach((opt, oi) => {
+      optsHtml += `<button class="opt" data-qi="${qi}" data-oi="${oi}">
+        <span class="opt-radio"></span>
+        <span>${opt}</span>
+      </button>`;
+    });
+
+    card.innerHTML = `
+      <div class="q-body">
+        <p class="q-prompt"><span class="q-num">${qi + 1}.</span>${q.prompt}</p>
+        <div class="options">${optsHtml}</div>
+        <div class="explain ok-box" id="ok-explain-${qi}">
+          <span class="explain-tag">✓ Por que a resposta correta está certa</span>
+          <p>${q.why}</p>
+        </div>
+        <div class="explain bad-box" id="bad-explain-${qi}">
+          <span class="explain-tag">✕ Por que sua alternativa está errada</span>
+          <p id="bad-explain-text-${qi}"></p>
+        </div>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+
+  document.querySelectorAll(".opt").forEach(btn => {
+    btn.addEventListener("click", handleAnswer);
+  });
+
+  updateStatus();
+}
+
+function handleAnswer(e) {
+  const btn = e.currentTarget;
+  const qi = parseInt(btn.dataset.qi);
+  const oi = parseInt(btn.dataset.oi);
+
+  if (userAnswers[qi] !== null) return;
+
+  const q = QUESTIONS[qi];
+  const isCorrect = oi === q.correct;
+  userAnswers[qi] = oi;
+  answered++;
+  if (isCorrect) score++;
+
+  const card = document.getElementById("card-" + qi);
+  card.classList.remove("active");
+  card.classList.add("done", isCorrect ? "correct" : "incorrect");
+
+  const allOpts = card.querySelectorAll(".opt");
+  allOpts.forEach((o, idx) => {
+    o.disabled = true;
+    if (idx === q.correct) {
+      o.classList.add("correct-answer");
+    } else if (idx === oi && !isCorrect) {
+      o.classList.add("wrong-answer");
+    } else {
+      o.classList.add("muted");
+    }
+  });
+
+  document.getElementById("ok-explain-" + qi).classList.add("show");
+
+  if (!isCorrect) {
+    const badTextEl = document.getElementById("bad-explain-text-" + qi);
+    badTextEl.textContent = buildWrongExplanation(q, oi);
+    document.getElementById("bad-explain-" + qi).classList.add("show");
+  }
+
+  updateStatus();
+
+  const next = qi + 1;
+  if (next < QUESTIONS.length) {
+    current = next;
+    document.getElementById("card-" + next).classList.add("active");
+    setTimeout(() => {
+      document.getElementById("card-" + next).scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 250);
+  } else {
+    showSummary();
+  }
+}
+
+function buildWrongExplanation(q, chosenIdx) {
+  const chosenText = q.options[chosenIdx];
+  return "Você escolheu: \"" + chosenText + "\". Essa alternativa descreve algo real do material, só que associado a outro painel, tabela ou exemplo — releia a explicação acima com atenção.";
+}
+
+function updateStatus() {
+  document.getElementById("cur-q").textContent = Math.min(answered + (answered < QUESTIONS.length ? 1 : 0), QUESTIONS.length);
+  document.getElementById("score").textContent = score;
+  document.getElementById("answered").textContent = answered;
+  const pct = (answered / QUESTIONS.length) * 100;
+  document.getElementById("progress-fill").style.width = pct + "%";
+}
+
+function showSummary() {
+  const pct = Math.round((score / QUESTIONS.length) * 100);
+  document.getElementById("summary-score").textContent = score + "/" + QUESTIONS.length;
+  let icon, msg;
+  if (pct >= 85) {
+    icon = "🟢";
+    msg = "Excelente! Tipos de componentes, nomenclatura, versionamento semântico, segurança e os três métodos de distribuição estão bem consolidados.";
+  } else if (pct >= 60) {
+    icon = "🟡";
+    msg = "Bom resultado. Releia as explicações — várias tabelas aqui têm colunas parecidas entre métodos/tipos diferentes, então vale reforçar qual detalhe pertence a qual.";
+  } else {
+    icon = "🔴";
+    msg = "Vale reler o material sobre gerenciar e aproveitar componentes reutilizáveis com calma antes de refazer este simulado.";
+  }
+  document.getElementById("summary-icon").textContent = icon;
+  document.getElementById("summary-msg").textContent = msg;
+  document.getElementById("summary").classList.add("show");
+  setTimeout(() => {
+    document.getElementById("summary").scrollIntoView({ behavior: "smooth", block: "center" });
+  }, 300);
+}
+
+function restartQuiz() {
+  current = 0;
+  score = 0;
+  answered = 0;
+  userAnswers.fill(null);
+  document.getElementById("summary").classList.remove("show");
+  renderAll();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+renderAll();
+</script>
+</body>
+</html>

@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulado Modulo 7, dia 34 - GitHub Actions: Gerenciamento de Executores (Runners)</title>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #ffffff;
+            color: #222222;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+        h1 {
+            text-align: center;
+            color: #111111;
+            font-size: 1.8em;
+            margin-bottom: 5px;
+        }
+        h2 {
+            text-align: center;
+            color: #555555;
+            font-size: 1.2em;
+            margin-top: 0;
+            margin-bottom: 40px;
+            font-weight: normal;
+        }
+        .question-card {
+            background: #ffffff;
+            border: 1px solid #d0d0d0;
+            padding: 35px;
+            margin-bottom: 45px;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .question-number {
+            font-weight: bold;
+            color: #333333;
+            font-size: 1.15em;
+            margin-bottom: 12px;
+        }
+        .question-text {
+            font-size: 1.05em;
+            margin-bottom: 25px;
+            color: #1a1a1a;
+            font-weight: 500;
+        }
+        .options-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .option-label {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            cursor: pointer;
+            padding: 14px 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            background-color: #fafafa;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        .option-label:hover {
+            background-color: #f0f4f8;
+            border-color: #b0c4de;
+        }
+        .option-label input {
+            margin-top: 4px;
+            cursor: pointer;
+        }
+        .btn-submit {
+            background-color: #24292e;
+            color: white;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1em;
+            transition: background-color 0.2s;
+        }
+        .btn-submit:hover {
+            background-color: #0366d6;
+        }
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            display: none;
+            font-size: 1em;
+            line-height: 1.5;
+        }
+        .correct {
+            background-color: #e6ffed;
+            color: #22863a;
+            border: 1px solid #b7ebcc;
+        }
+        .incorrect {
+            background-color: #ffeef0;
+            color: #cb2431;
+            border: 1px solid #f9d8d6;
+        }
+        #score-container {
+            text-align: center;
+            font-size: 1.4em;
+            font-weight: bold;
+            margin-top: 50px;
+            padding: 25px;
+            border: 2px dashed #24292e;
+            border-radius: 8px;
+            background-color: #f6f8fa;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Simulado Modulo 7 dia 34 - GitHub Actions</h1>
+    <h2>Gerenciamento de Corredores (Executores / Runners)</h2>
+
+    <div id="quiz-container">
+
+        <!-- Q1 -->
+        <div class="question-card" id="q1">
+            <div class="question-number">Questão 1</div>
+            <div class="question-text">O que são executores (runners) no contexto do GitHub Actions e quais são os dois tipos principais apresentados no material?</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q1" value="A"> A) São bancos de dados em nuvem divididos entre bancos relacionais e não relacionais.</label>
+                <label class="option-label"><input type="radio" name="q1" value="B"> B) São os ambientes onde os jobs dos fluxos de trabalho são executados, divididos em executores hospedados no GitHub e executores auto-hospedados.</label>
+                <label class="option-label"><input type="radio" name="q1" value="C"> C) São arquivos de configuração de segurança estáticos executados apenas localmente via Docker.</label>
+                <label class="option-label"><input type="radio" name="q1" value="D"> D) São ferramentas de versionamento de código equivalentes ao git clone.</label>
+            </div>
+            <button class="btn-submit" onclick="verificar(1, 'B')">Enviar Resposta</button>
+            <div class="feedback" id="fb1"></div>
+        </div>
+
+        <!-- Q2 -->
+        <div class="question-card" id="q2">
+            <div class="question-number">Questão 2</div>
+            <div class="question-text">Em relação ao gerenciamento do sistema operacional, ferramentas e limpeza do ambiente, qual é a principal diferença entre os executores hospedados no GitHub e os auto-hospedados?</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q2" value="A"> A) Nos hospedados no GitHub a instância é limpa a cada execução e o GitHub gerencia tudo; nos auto-hospedados você gerencia o SO/ferramentas e a máquina não precisa ser limpa automaticamente a cada job.</label>
+                <label class="option-label"><input type="radio" name="q2" value="B"> B) Os executores auto-hospedados são limpos automaticamente a cada job, enquanto os hospedados exigem manutenção manual de drivers.</label>
+                <label class="option-label"><input type="radio" name="q2" value="C"> C) Não há nenhuma diferença de gerenciamento, sendo ambos totalmente administrados pela comunidade open source.</label>
+                <label class="option-label"><input type="radio" name="q2" value="D"> D) Os executores hospedados permitem total personalização de hardware físico local (on-premises).</label>
+            </div>
+            <button class="btn-submit" onclick="verificar(2, 'A')">Enviar Resposta</button>
+            <div class="feedback" id="fb2"></div>
+        </div>
+
+        <!-- Q3 -->
+        <div class="question-card" id="q3">
+            <div class="question-number">Questão 3</div>
+            <div class="question-text">Quando é recomendado o uso de executores auto-hospedados em um projeto ou organização?</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q3" value="A"> A) Apenas para execuções rápidas e simples que não necessitam de bibliotecas externas.</label>
+                <label class="option-label"><input type="radio" name="q3" value="B"> B) Quando se precisa de lista de permissões de IP, configuração de hardware especializada, ambiente personalizado (SO/ferramentas) ou execução na própria infraestrutura (nuvem ou on-premises).</label>
+                <label class="option-label"><input type="radio" name="q3" value="C"> C) Sempre que o projeto desejar custos por minuto cobrados diretamente pelo GitHub Cloud.</label>
+                <label class="option-label"><input type="radio" name="q3" value="D"> D) Exclusivamente para testes rápidos de linters de código JavaScript.</label>
+            </div>
+            <button class="btn-submit" onclick="verificar(3, 'B')">Enviar Resposta</button>
+            <div class="feedback" id="fb3"></div>
+        </div>
+
+        <!-- Q4 -->
+        <div class="question-card" id="q4">
+            <div class="question-number">Questão 4</div>
+            <div class="question-text">Qual é o principal benefício corporativo e de segurança ao utilizar listas de permissões de IP (IP allow lists) para os executores?</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q4" value="A"> A) Aprimorar a segurança impedindo acessos não autorizados, controlar o tráfego de rede (permitindo apenas IPs conhecidos) e ajudar na conformidade regulatória.</label>
+                <label class="option-label"><input type="radio" name="q4" value="B"> B) Aumentar a velocidade de download de pacotes públicos da internet sem restrições.</label>
+                <label class="option-label"><input type="radio" name="q4" value="C"> C) Ocultar completamente os logs de execução de todos os desenvolvedores da equipe.</label>
+                <label class="option-label"><input type="radio" name="q4" value="D"> D) Eliminar a necessidade de autenticação por tokens em repositórios privados.</label>
+            </div>
+            <button class="btn-submit" onclick="verificar(4, 'A')">Enviar Resposta</button>
+            <div class="feedback" id="fb4"></div>
+        </div>
+
+        <!-- Q5 -->
+        <div class="question-card" id="q5">
+            <div class="question-number">Questão 5</div>
+            <div class="question-text">Em termos de endereçamento de IP, como se diferenciam os executores hospedados no GitHub dos executores auto-hospedados?</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q5" value="A"> A) Os executores hospedados utilizam IPs estáticos fixos, enquanto os auto-hospedados utilizam IPs dinâmicos que mudam periodicamente.</label>
+                <label class="option-label"><input type="radio" name="q5" value="B"> B) Os executores hospedados utilizam IPs dinâmicos que mudam periodicamente (sendo necessário usar intervalos de IP publicados), enquanto os auto-hospedados utilizam IPs estáticos ou controlados.</label>
+                <label class="option-label"><input type="radio" name="q5" value="C"> C) Ambos utilizam exclusivamente IPs públicos totalmente abertos sem controle de firewall.</label>
+                <label class="option-label"><input type="radio" name="q5" value="D"> D) Nenhuma das opções anteriores descreve a infraestrutura de rede oficial.</label>
+            </div>
+            <button class="btn-submit" onclick="verificar(5, 'B')">Enviar Resposta</button>
+            <div class="feedback" id="fb5"></div>
+        </div>
+
+        <!-- Q6 -->
+        <div class="question-card" id="q6">
+            <div class="question-number">Questão 6</div>
+            <div class="question-text">O que deve ser observado e mantido em relação aos intervalos de IP publicados pelo GitHub para os executores hospedados?</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q6" value="A"> A) Eles são permanentes e nunca mudam, portanto não exigem manutenção.</label>
+                <label class="option-label"><input type="radio" name="q6" value="B"> B) Os intervalos de IP podem mudar, por isso é fundamental manter a lista sempre atualizada.</label>
+                <label class="option-label"><input type="radio" name="q6" value="C"> C) Eles são proibidos de serem utilizados em ambientes corporativos com restrição de rede.</label>
+                <label class="option-label"><input type="radio" name="q6" value="D"> D) Devem ser substituídos por scripts manuais em Python a cada execução.</label>
+            </div>
+            <button class="btn-submit" onclick="verificar(6, 'B')">Enviar Resposta</button>
+            <div class="feedback" id="fb6"></div>
+        </div>
+
+        <!-- Q7 -->
+        <div class="question-card" id="q7">
+            <div class="question-number">Questão 7</div>
+            <div class="question-text">Quais são os principais riscos associados ao uso de executores auto-hospedados e quais mitigações o material recomenda?</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q7" value="A"> A) Risco de acesso não autorizado (mitigado com listas de permissões de IP), exposição de segredos (mitigado usando GitHub Secrets e não variáveis de ambiente) e comprometimento do executor (mitigado usando executores efêmeros).</label>
+                <label class="option-label"><input type="radio" name="q7" value="B"> B) Risco de falha de hardware elétrico (mitigado com no-breaks corporativos).</label>
+                <label class="option-label"><input type="radio" name="q7" value="C"> C) Risco de lentidão na rede pública (mitigado com o encerramento do GitHub Actions).</label>
+                <label class="option-label"><input type="radio" name="q7" value="D"> D) Risco de expiração de licença de software (mitigado com renovação automática semestral).</label>
+            </div>
+            <button class="btn-submit" onclick="verificar(7, 'A')">Enviar Resposta</button>
+            <div class="feedback" id="fb7"></div>
+        </div>
+
+        <!-- Q8 -->
+        <div class="question-card" id="q8">
+            <div class="question-number">Questão 8</div>
+            <div class="question-text">O que caracteriza um executor efêmero (ephemeral runner) e qual é a sua principal vantagem de segurança?</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q8" value="A"> A) É um executor que roda na nuvem pública por tempo indeterminado sem reinicialização.</label>
+                <label class="option-label"><input type="radio" name="q8" value="B"> B) É um executor que é redefinido/destruído após cada trabalho (job), impedindo a persistência de alterações maliciosas ou resíduos de execução.</label>
+                <label class="option-label"><input type="radio" name="q8" value="C"> C) É um executor físico que exige instalação manual de cabos de rede a cada build.</label>
+                <label class="option-label"><input type="radio" name="q8" value="D"> D) É um tipo de container que armazena senhas em texto plano para acesso rápido.</label>
+            </div>
+            <button class="btn-submit" onclick="verificar(8, 'B')">Enviar Resposta</button>
+            <div class="feedback" id="fb8"></div>
+        </div>
+
+        <!-- Q9 -->
+        <div class="question-card" id="q9">
+            <div class="question-number">Questão 9</div>
+            <div class="question-text">Em relação aos segredos (secrets) em executores auto-hospedados, qual prática deve ser adotada para evitar vazamentos e exposição indevida?</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q9" value="A"> A) Armazenar segredos em variáveis de ambiente comuns do sistema operacional para facilitar o acesso.</label>
+                <label class="option-label"><input type="radio" name="q9" value="B"> B) Utilizar sempre o GitHub Secrets e evitar o uso de variáveis de ambiente comuns para dados sensíveis.</label>
+                <label class="option-label"><input type="radio" name="q9" value="C"> C) Gravar os segredos diretamente no arquivo <code>README.md</code> do repositório.</label>
+                <label class="option-label"><input type="radio" name="q9" value="D"> D) Enviar os segredos por e-mail criptografado para os desenvolvedores responsáveis.</label>
+            </div>
+            <button class="btn-submit" onclick="verificar(9, 'B')">Enviar Resposta</button>
+            <div class="feedback" id="fb9"></div>
+        </div>
+
+        <!-- Q10 -->
+        <div class="question-card" id="q10">
+            <div class="question-number">Questão 10</div>
+            <div class="question-text">Quais são as boas práticas essenciais recomendadas no material para o gerenciamento seguro de executores?</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q10" value="A"> A) Escolher o tipo de executor adequado para a carga de trabalho, manter executores/ferramentas atualizados, usar listas de permissões de IP, restringir acesso, monitorar/revisar configurações e documentar processos.</label>
+                <label class="option-label"><input type="radio" name="q10" value="B"> B) Permitir que qualquer usuário crie executores públicos sem restrição de acesso ou monitoramento.</label>
+                <label class="option-label"><input type="radio" name="q10" value="C"> C) Desativar atualizações automáticas e utilizar sempre versões desatualizadas de softwares.</label>
+                <label class="option-label"><input type="radio" name="q10" value="D"> D) Ignorar políticas de segurança da organização em prol da velocidade de entrega.</label>
+            </div>
+            <button class="btn-submit" onclick="verificar(10, 'A')">Enviar Resposta</button>
+            <div class="feedback" id="fb10"></div>
+        </div>
+
+    </div>
+
+    <div id="score-container"></div>
+
+    <script>
+        let acertos = 0;
+        let respondidas = 0;
+        const totalQuestoes = 10;
+
+        const gabaritoExplicacoes = {
+            1: { correta: 'B', texto: 'Correto! Os executores são os ambientes onde os jobs rodam, divididos entre hospedados no GitHub e auto-hospedados.' },
+            2: { correta: 'A', texto: 'Correto! Nos hospedados o GitHub gerencia e limpa a instância a cada job; nos auto-hospedados você gerencia o SO e ferramentas locais.' },
+            3: { correta: 'B', texto: 'Correto! Usa-se auto-hospedados quando é preciso hardware especializado, ambiente personalizado ou infraestrutura própria.' },
+            4: { correta: 'A', texto: 'Correto! Listas de permissões de IP aprimoram a segurança, controlam o tráfego de rede e auxiliam na conformidade.' },
+            5: { correta: 'B', texto: 'Correto! Executores hospedados usam IPs dinâmicos (intervalos publicados), enquanto auto-hospedados usam IPs estáticos ou controlados.' },
+            6: { correta: 'B', texto: 'Correto! Como os intervalos de IP do GitHub podem mudar periodicamente, é fundamental manter a lista sempre atualizada.' },
+            7: { correta: 'A', texto: 'Correto! Os principais riscos envolvem acesso não autorizado, exposição de segredos e comprometimento, mitigados com IPs permitidos, GitHub Secrets e executores efêmeros.' },
+            8: { correta: 'B', texto: 'Correto! Executores efêmeros são redefinidos após cada trabalho, impedindo que resíduos ou alterações maliciosas persistam.' },
+            9: { correta: 'B', texto: 'Correto! Para evitar vazamentos em executores auto-hospedados, deve-se utilizar o GitHub Secrets em vez de variáveis de ambiente comuns.' },
+            10: { correta: 'A', texto: 'Correto! As boas práticas incluem escolha adequada de executores, atualizações, controle de IP, restrição de acesso, monitoramento e documentação.' }
+        };
+
+        function verificar(numQuestao, respostaCorreta) {
+            const inputs = document.getElementsByName('q' + numQuestao);
+            let selecionada = null;
+
+            for (let input of inputs) {
+                if (input.checked) {
+                    selecionada = input.value;
+                    break;
+                }
+            }
+
+            if (!selecionada) {
+                alert('Por favor, selecione uma alternativa antes de enviar.');
+                return;
+            }
+
+            for (let input of inputs) {
+                input.disabled = true;
+            }
+            const card = document.getElementById('q' + numQuestao);
+            const btn = card.querySelector('.btn-submit');
+            btn.disabled = true;
+            btn.style.backgroundColor = '#cccccc';
+            btn.style.cursor = 'not-allowed';
+
+            const fb = document.getElementById('fb' + numQuestao);
+            fb.style.display = 'block';
+
+            if (selecionada === respostaCorreta) {
+                fb.className = 'feedback correct';
+                fb.innerHTML = '<strong>Resposta Correta!</strong> ' + gabaritoExplicacoes[numQuestao].texto;
+                acertos++;
+            } else {
+                fb.className = 'feedback incorrect';
+                fb.innerHTML = '<strong>Resposta Incorreta.</strong> A alternativa correta era a letra ' + respostaCorreta + '. ' + gabaritoExplicacoes[numQuestao].texto;
+            }
+
+            respondidas++;
+            if (respondidas === totalQuestoes) {
+                const scoreContainer = document.getElementById('score-container');
+                scoreContainer.style.display = 'block';
+                scoreContainer.innerHTML = `Fim do Simulado! Sua pontuação final foi de <strong>${acertos}</strong> acertos de <strong>${totalQuestoes}</strong> questões.`;
+            }
+        }
+    </script>
+</body>
+</html>

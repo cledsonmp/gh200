@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulado - Módulo 7: Gerenciando e aproveitando componentes reutilizáveis no GitHub Actions</title>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #ffffff;
+            color: #222222;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 30px 20px;
+            line-height: 1.6;
+        }
+        h1 {
+            text-align: center;
+            color: #111111;
+            font-size: 1.8em;
+            margin-bottom: 5px;
+        }
+        h2 {
+            text-align: center;
+            color: #555555;
+            font-size: 1.2em;
+            margin-top: 0;
+            margin-bottom: 40px;
+            font-weight: normal;
+        }
+        .question-card {
+            background: #ffffff;
+            border: 1px solid #d0d0d0;
+            padding: 30px;
+            margin-bottom: 35px;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .question-number {
+            font-weight: bold;
+            color: #333333;
+            font-size: 1.15em;
+            margin-bottom: 12px;
+        }
+        .question-text {
+            font-size: 1.05em;
+            margin-bottom: 25px;
+            color: #1a1a1a;
+            font-weight: 500;
+        }
+        .options-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .option-label {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            cursor: pointer;
+            padding: 12px 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            background-color: #fafafa;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        .option-label:hover {
+            background-color: #f0f4f8;
+            border-color: #b0c4de;
+        }
+        .option-label input {
+            margin-top: 4px;
+            cursor: pointer;
+        }
+        .btn-submit {
+            background-color: #24292e;
+            color: white;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1em;
+            transition: background-color 0.2s;
+        }
+        .btn-submit:hover {
+            background-color: #0366d6;
+        }
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            display: none;
+            font-size: 1em;
+            line-height: 1.5;
+        }
+        .correct {
+            background-color: #e6ffed;
+            color: #22863a;
+            border: 1px solid #b7ebcc;
+        }
+        .incorrect {
+            background-color: #ffeef0;
+            color: #cb2431;
+            border: 1px solid #f9d8d6;
+        }
+        #score-container {
+            text-align: center;
+            font-size: 1.4em;
+            font-weight: bold;
+            margin-top: 50px;
+            padding: 25px;
+            border: 2px dashed #24292e;
+            border-radius: 8px;
+            background-color: #f6f8fa;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Simulado Módulo 7, dia 33</h1>
+    <h2>Módulo 7: Gerenciando e aproveitando componentes reutilizáveis</h2>
+
+    <div id="quiz-container">
+
+        <!-- Q1 -->
+        <div class="question-card" id="q1">
+            <div class="question-number">Questão 1</div>
+            <div class="question-text">Qual é o principal objetivo corporativo e estrutural da utilização de componentes reutilizáveis (fluxos de trabalho, ações e scripts) no GitHub Actions?</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q1" value="A"> A) Substituir permanentemente a necessidade de uso de servidores de banco de dados relacionais e em nuvem.</label>
+                <label class="option-label"><input type="radio" name="q1" value="B"> B) Ajuda a padronizar pipelines de CI/CD, melhorar a manutenção, reduzir configuração redundante e permitir escala, segurança e governança.</label>
+                <label class="option-label"><input type="radio" name="q1" value="C"> C) Garantir que todos os repositórios públicos e privados fiquem visíveis para qualquer usuário externo na plataforma.</label>
+                <label class="option-label"><input type="radio" name="q1" value="D"> D) Impedir totalmente que desenvolvedores criem scripts em Bash, PowerShell ou Python nas equipes.</label>
+            </div>
+            <button class="btn-submit" onclick="verificar(1, 'B')">Enviar Resposta</button>
+            <div class="feedback" id="fb1"></div>
+        </div>
+
+        <!-- Q2 -->
+        <div class="question-card" id="q2">
+            <div class="question-number">Questão 2</div>
+            <div class="question-text">Sobre os tipos de componentes reutilizáveis no GitHub Actions, como são caracterizados os fluxos de trabalho reutilizáveis e as ações personalizadas?</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q2" value="A"> A) Fluxos são definidos uma vez e referenciados em vários repositórios (ex: build e deploy padrão); ações personalizadas são criadas para tarefas repetidas (ex: linting de código).</label>
+                <label class="option-label"><input type="radio" name="q2" value="B"> B) Fluxos servem apenas para gerar relatórios de conformidade em Bash, enquanto ações personalizadas armazenam scripts de banco de dados.</label>
+                <label class="option-label"><input type="radio" name="q2" value="C"> C) Fluxos exigem execução manual obrigatória por interface web, e ações personalizadas rodam exclusivamente no GitHub Packages.</label>
+                <label class="option-label"><input type="radio" name="q2" value="D"> D) Não há diferença técnica entre eles, sendo ambos restritos a repositórios sem controle de versão.</label>
+            </div>
+            <button class="btn-submit" onclick="verificar(2, 'A')">Enviar Resposta</button>
+            <div class="feedback" id="fb2"></div>
+        </div>
+
+        <!-- Q3 -->
+        <div class="question-card" id="q3">
+            <div class="question-number">Questão 3</div>
+            <div class="question-text">Em relação à estrutura padrão recomendada para repositórios centralizados, qual é a finalidade de um <strong>Repositório de Ações</strong>?</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q3" value="A"> A) Manter exclusivamente scripts utilitários em Python para auditoria de containers.</label>
+                <label class="option-label"><input type="radio" name="q3" value="B"> B) Conter fluxos de trabalho reutilizáveis de CI/CD baseados em arquivos YAML.</label>
+                <label class="option-label"><input type="radio" name="q3" value="C"> C) Armazenar ações personalizadas que podem ser reutilizadas por diferentes equipes e projetos.</label>
+                <label class="option-label"><input type="radio" name="q3" value="D"> D) Gerenciar issues e discussões de feedback dos clientes externos.</label>
+            </div>
+            <button class="btn-submit" onclick="verificar(3, 'C')">Enviar Resposta</button>
+            <div class="feedback" id="fb3"></div>
+        </div>
+
+        <!-- Q4 -->
+        <div class="question-card" id="q4">
+            <div class="question-number">Questão 4</div>
+            <div class="question-text">De acordo com as convenções de nomenclatura oficiais apresentadas no material, como devem ser nomeados os repositórios, os workflows/ações e as recomendações para nomes de ações?</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q4" value="A"> A) Repositórios devem usar nomes descritivos e hifenizados (ex: org-actions-repo); workflows devem usar o formato <code>[scope]-[purpose]</code>; e ações devem usar PascalCase ou kebab-case com descrições claras.</label>
+                <label class="option-label"><input type="radio" name="q4" value="B"> B) Repositórios devem usar espaços em branco e letras maiúsculas misturadas com caracteres especiais.</label>
+                <label class="option-label"><input type="radio" name="q4" value="C"> C) Workflows devem obrigatoriamente usar extensão <code>.txt</code> e nomes numéricos sequenciais.</label>
+                <label class="option-label"><input type="radio" name="q4" value="D"> D) Ações não precisam de descrições nem de padronização de nomenclatura.</label>
+            </div>
+            <button class="btn-submit" onclick="verificar(4, 'A')">Enviar Resposta</button>
+            <div class="feedback" id="fb4"></div>
+        </div>
+
+        <!-- Q5 -->
+        <div class="question-card" id="q5">
+            <div class="question-number">Questão 5</div>
+            <div class="question-text">Para chamar e executar com sucesso um fluxo de trabalho reutilizável localizado em um repositório externo, qual palavra-chave gatilho (trigger) deve ser configurada no arquivo de workflow chamado?</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q5" value="A"> A) <code>on: schedule:</code></label>
+                <label class="option-label"><input type="radio" name="q5" value="B"> B) <code>on: workflow_call:</code></label>
+                <label class="option-label"><input type="radio" name="q5" value="C"> C) <code>on: repository_dispatch:</code></label>
+                <label class="option-label"><input type="radio" name="q5" value="D"> D) <code>on: pull_request_target:</code></label>
+            </div>
+            <button class="btn-submit" onclick="verificar(5, 'B')">Enviar Resposta</button>
+            <div class="feedback" id="fb5"></div>
+        </div>
+
+        <!-- Q6 -->
+        <div class="question-card" id="q6">
+            <div class="question-number">Questão 6</div>
+            <div class="question-text">Em relação ao controle de versão e dependências em componentes reutilizáveis, qual prática deve ser evitada e qual regra de versionamento semântico se aplica a alterações que quebram a compatibilidade (breaking changes)?</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q6" value="A"> A) Deve-se usar sempre <code>@latest</code> em workflows; alterações principais (Principal: v2.0.0) indicam alterações que quebram compatibilidade.</label>
+                <label class="option-label"><input type="radio" name="q6" value="B"> B) Deve-se evitar usar <code>@latest</code> em workflows; alterações principais (Principal: v2.0.0) indicam alterações que quebram compatibilidade.</label>
+                <label class="option-label"><input type="radio" name="q6" value="C"> C) Deve-se fixar versões em arquivos de texto simples semântico e ignorar atualizações de dependências.</label>
+                <label class="option-label"><input type="radio" name="q6" value="D"> D) Versões secundárias corrigem bugs críticos de segurança e versões patch adicionam novos recursos incompatíveis.</label>
+            </div>
+            <button class="btn-submit" onclick="verificar(6, 'B')">Enviar Resposta</button>
+            <div class="feedback" id="fb6"></div>
+        </div>
+
+        <!-- Q7 -->
+        <div class="question-card" id="q7">
+            <div class="question-number">Questão 7</div>
+            <div class="question-text">Para garantir a documentação padronizada e diretrizes de contribuição eficientes, o que cada repositório de componentes reutilizáveis deve incluir obrigatoriamente segundo o material?</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q7" value="A"> A) Apenas um arquivo compactado <code>.zip</code> com códigos-fonte desatualizados.</label>
+                <label class="option-label"><input type="radio" name="q7" value="B"> B) <code>README.md</code> (finalidade, como usar, exemplos), <code>CHANGELOG.md</code> (histórico de versões) e <code>CONTRIBUTING.md</code> (diretrizes de contribuição).</label>
+                <label class="option-label"><input type="radio" name="q7" value="C"> C) Documentação restrita exclusivamente a wikis internas sem controle de histórico.</label>
+                <label class="option-label"><input type="radio" name="q7" value="D"> D) Arquivos binários executáveis sem documentação em texto.</label>
+            </div>
+            <button class="btn-submit" onclick="verificar(7, 'B')">Enviar Resposta</button>
+            <div class="feedback" id="fb7"></div>
+        </div>
+
+        <!-- Q8 -->
+        <div class="question-card" id="q8">
+            <div class="question-number">Questão 8</div>
+            <div class="question-text">Quais são as três medidas específicas recomendadas no material para assegurar um melhor controle de segurança e acesso em repositórios de ações?</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q8" value="A"> A) Desativar autenticação multifator, remover arquivos README e permitir gravação pública irrestrita.</label>
+                <label class="option-label"><input type="radio" name="q8" value="B"> B) Restringir o acesso de gravação a repositórios de ações, exigir revisões de código e CODEOWNERS, e usar escaneamento de segredos do GitHub.</label>
+                <label class="option-label"><input type="radio" name="q8" value="C"> C) Utilizar senhas compartilhadas em texto plano e desativar logs de auditoria.</label>
+                <label class="option-label"><input type="radio" name="q8" value="D"> D) Bloquear completamente o uso de pull requests em todas as organizações.</label>
+            </div>
+            <button class="btn-submit" onclick="verificar(8, 'B')">Enviar Resposta</button>
+            <div class="feedback" id="fb8"></div>
+        </div>
+
+        <!-- Q9 -->
+        <div class="question-card" id="q9">
+            <div class="question-number">Questão 9</div>
+            <div class="question-text">Para automatizar atualizações e gerenciar dependências com segurança, quais práticas devem ser implementadas nos repositórios?</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q9" value="A"> B) Implementar uma ação para testar workflows e ações antes de mesclar, e usar Dependabot para dependências desatualizadas.</label>
+                <label class="option-label"><input type="radio" name="q9" value="B"> A) Atualizar diretamente em produção sem testes prévios e desabilitar alertas automáticos.</label>
+                <label class="option-label"><input type="radio" name="q9" value="C"> C) Executar scripts locais manuais sem integração contínua.</label>
+                <label class="option-label"><input type="radio" name="q9" value="D"> D) Ignorar dependências desatualizadas por tempo indeterminado.</label>
+            </div>
+            <button class="btn-submit" onclick="verificar(9, 'A')">Enviar Resposta</button>
+            <div class="feedback" id="fb9"></div>
+        </div>
+
+        <!-- Q10 -->
+        <div class="question-card" id="q10">
+            <div class="question-number">Questão 10</div>
+            <div class="question-text">Analisando os três métodos principais de distribuição de ações na empresa (GitHub Marketplace, Repositórios da organização e Pacotes do GitHub), qual característica e controle de acesso se aplicam aos <strong>Pacotes do GitHub (contêineres)</strong>?</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q10" value="A"> A) Distribuição pública sem nenhuma restrição de acesso ou segurança.</label>
+                <label class="option-label"><input type="radio" name="q10" value="B"> B) Uso interno seguro, onde a autenticação é necessária e as imagens devem ser protegidas contra adulteração.</label>
+                <label class="option-label"><input type="radio" name="q10" value="C"> C) Acesso livre para qualquer usuário externo da internet sem necessidade de credenciais.</label>
+                <label class="option-label"><input type="radio" name="q10" value="D"> D) Restrito apenas a scripts de shell locais sem suporte a imagens de contêiner.</label>
+            </div>
+            <button class="btn-submit" onclick="verificar(10, 'B')">Enviar Resposta</button>
+            <div class="feedback" id="fb10"></div>
+        </div>
+
+    </div>
+
+    <div id="score-container"></div>
+
+    <script>
+        let acertos = 0;
+        let respondidas = 0;
+        const totalQuestoes = 10;
+
+        const gabaritoExplicacoes = {
+            1: { correta: 'B', texto: 'Correto! Os componentes reutilizáveis ajudam a padronizar pipelines de CI/CD, melhorar a manutenção, reduzir configuração redundante e garantir escala, segurança e governança.' },
+            2: { correta: 'A', texto: 'Correto! Fluxos de trabalho reutilizáveis são definidos uma vez e referenciados em múltiplos repositórios (ex: build e deploy), enquanto ações personalizadas são criadas para tarefas repetidas (ex: linting).' },
+            3: { correta: 'C', texto: 'Correto! O Repositório de Ações tem como finalidade armazenar ações personalizadas desenvolvidas para uso corporativo.' },
+            4: { correta: 'A', texto: 'Correto! A convenção oficial orienta nomes descritivos/hifenizados para repositórios, formato <code>[scope]-[purpose]</code> para workflows e PascalCase ou kebab-case com descrições claras para ações.' },
+            5: { correta: 'B', texto: 'Correto! Workflows reutilizáveis exigem obrigatoriamente a trigger <code>on: workflow_call:</code> para poderem ser chamados por outros fluxos.' },
+            6: { correta: 'B', texto: 'Correto! Deve-se evitar o uso de <code>@latest</code> em workflows de produção. No versionamento semântico, alterações principais (v2.0.0) indicam breaking changes (mudanças que quebram a compatibilidade).' },
+            7: { correta: 'B', texto: 'Correto! Cada repositório deve incluir <code>README.md</code>, <code>CHANGELOG.md</code> e <code>CONTRIBUTING.md</code> para garantir documentação e clareza de uso.' },
+            8: { correta: 'B', texto: 'Correto! As três medidas essenciais de segurança e acesso listadas no material são: restringir acesso de gravação, exigir revisões de código/CODEOWNERS e usar escaneamento de segredos.' },
+            9: { correta: 'A', texto: 'Correto! Para automatizar atualizações com segurança, deve-se implementar ações para testar workflows/ações antes de mesclar e utilizar o Dependabot.' },
+            10: { correta: 'B', texto: 'Correto! Os Pacotes do GitHub (contêineres) fornecem uso interno seguro, exigindo autenticação e proteção contra adulteração nas imagens.' }
+        };
+
+        function verificar(numQuestao, respostaCorreta) {
+            const inputs = document.getElementsByName('q' + numQuestao);
+            let selecionada = null;
+
+            for (let input of inputs) {
+                if (input.checked) {
+                    selecionada = input.value;
+                    break;
+                }
+            }
+
+            if (!selecionada) {
+                alert('Por favor, selecione uma alternativa antes de enviar.');
+                return;
+            }
+
+            for (let input of inputs) {
+                input.disabled = true;
+            }
+            const card = document.getElementById('q' + numQuestao);
+            const btn = card.querySelector('.btn-submit');
+            btn.disabled = true;
+            btn.style.backgroundColor = '#cccccc';
+            btn.style.cursor = 'not-allowed';
+
+            const fb = document.getElementById('fb' + numQuestao);
+            fb.style.display = 'block';
+
+            if (selecionada === respostaCorreta) {
+                fb.className = 'feedback correct';
+                fb.innerHTML = '<strong>Resposta Correta!</strong> ' + gabaritoExplicacoes[numQuestao].texto;
+                acertos++;
+            } else {
+                fb.className = 'feedback incorrect';
+                fb.innerHTML = '<strong>Resposta Incorreta.</strong> A alternativa correta era a letra ' + respostaCorreta + '. ' + gabaritoExplicacoes[numQuestao].texto;
+            }
+
+            respondidas++;
+            if (respondidas === totalQuestoes) {
+                const scoreContainer = document.getElementById('score-container');
+                scoreContainer.style.display = 'block';
+                scoreContainer.innerHTML = `Fim do Simulado! Sua pontuação final foi de <strong>${acertos}</strong> acertos de <strong>${totalQuestoes}</strong> questões.`;
+            }
+        }
+    </script>
+</body>
+</html>

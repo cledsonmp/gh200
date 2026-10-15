@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Simulado GitHub Actions - Self-hosted Runner</title>
+  <style>
+    :root{--ink:#24292f;--muted:#57606a;--line:#d0d7de;--soft:#f6f8fa;--blue:#0969da;--green:#1a7f37;--green-bg:#dafbe1;--red:#cf222e;--red-bg:#ffebe9}
+    *{box-sizing:border-box} body{margin:0;background:#fff;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+    .top{border-bottom:1px solid var(--line);background:#fff}.top-inner{max-width:900px;margin:auto;padding:22px 24px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+    .brand{font-weight:700;font-size:18px}.exam{color:var(--muted);font-size:14px}.wrap{max-width:900px;margin:0 auto;padding:30px 24px 60px}
+    .meta{display:flex;justify-content:space-between;gap:20px;color:var(--muted);font-size:14px;margin-bottom:9px}.bar{height:7px;background:#eaeef2;border-radius:99px;overflow:hidden;margin-bottom:34px}.fill{height:100%;background:var(--blue);transition:width .3s}
+    .card{border:1px solid var(--line);border-radius:8px;padding:30px;box-shadow:0 1px 2px rgba(31,35,40,.06)}
+    .tag{font-size:13px;color:var(--blue);font-weight:700;text-transform:uppercase;letter-spacing:.05em}.question{font-size:21px;line-height:1.45;margin:13px 0 24px;font-weight:600}
+    .options{display:grid;gap:12px}.option{width:100%;display:flex;gap:13px;align-items:flex-start;text-align:left;border:1px solid var(--line);background:#fff;border-radius:7px;padding:15px 16px;color:var(--ink);font-size:16px;line-height:1.4;cursor:pointer}
+    .option:hover:not(:disabled){border-color:var(--blue);background:#f6faff}.letter{width:27px;height:27px;border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:13px;flex:0 0 auto}.option.selected{border:2px solid var(--blue);padding:14px 15px;background:#f6faff}.option.selected .letter{background:var(--blue);border-color:var(--blue);color:#fff}
+    .option.correct{border:2px solid var(--green);padding:14px 15px;background:var(--green-bg)}.option.correct .letter{background:var(--green);border-color:var(--green);color:#fff}.option.wrong{border:2px solid var(--red);padding:14px 15px;background:var(--red-bg)}.option.wrong .letter{background:var(--red);border-color:var(--red);color:#fff}
+    .feedback{display:none;margin-top:22px;border-left:4px solid var(--green);background:var(--soft);padding:15px 17px;line-height:1.5}.feedback.bad{border-left-color:var(--red)}.feedback strong{display:block;margin-bottom:4px}.actions{display:flex;justify-content:flex-end;margin-top:25px}.next{border:1px solid #0969da;background:var(--blue);color:#fff;font-weight:600;padding:11px 22px;border-radius:6px;cursor:pointer;font-size:15px}.next:hover{background:#0757b8}
+    .result{text-align:center;padding:14px 5px}.score{font-size:54px;font-weight:800;color:var(--blue);margin:12px 0}.result h1{font-size:27px}.result p{color:var(--muted);font-size:17px}.result-actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:25px}.secondary{background:#fff;color:var(--ink);border:1px solid var(--line)}.review{margin-top:30px;text-align:left}.review-item{padding:15px 0;border-top:1px solid var(--line)}.review-item b{display:block;margin-bottom:5px}.ok{color:var(--green)}.no{color:var(--red)}
+    @media(max-width:600px){.top-inner,.wrap{padding-left:16px;padding-right:16px}.exam{display:none}.card{padding:21px 17px}.question{font-size:18px}.option{font-size:15px}}
+  </style>
+</head>
+<body>
+  <header class="top"><div class="top-inner"><div class="brand">GitHub Actions</div><div class="exam">Simulado - Self-hosted Runner no Linux</div></div></header>
+  <main class="wrap">
+    <div id="quiz">
+      <div class="meta"><span id="counter">Questão 1 de 10</span><span id="points">0 acertos</span></div>
+      <div class="bar"><div class="fill" id="fill" style="width:10%"></div></div>
+      <section class="card">
+        <div class="tag">Selecione uma alternativa</div>
+        <div class="question" id="question"></div>
+        <div class="options" id="options"></div>
+        <div class="feedback" id="feedback"></div>
+        <div class="actions"><button class="next" id="next">Próxima</button></div>
+      </section>
+    </div>
+    <section class="card result" id="result" hidden></section>
+  </main>
+  <script>
+    const questions = [
+      {q:'Sobre o diretório /opt/actions-runner, qual afirmação está correta?',o:['É criado automaticamente durante a instalação do Linux.','É criado pelo primeiro workflow executado.','É criado pelo administrador para instalar o aplicativo do runner.','É um diretório remoto disponibilizado pelo GitHub.'],a:2,e:'O diretório não vem pronto no Linux. O administrador o cria, e /opt é uma localização tradicional para softwares adicionais.'},
+      {q:'Qual requisito de rede é essencial para o runner comunicar-se com o GitHub?',o:['Conexões SSH de entrada na porta 22.','Acesso HTTPS de saída pela porta 443.','Servidor HTTP publicado na porta 80.','Conexões FTP de entrada na porta 21.'],a:1,e:'O aplicativo do runner inicia conexões HTTPS de saída para os serviços do GitHub pela porta 443.'},
+      {q:'Por que é recomendado executar o runner com um usuário dedicado, como actionsrunner?',o:['Para reduzir privilégios e separar os arquivos do runner.','Porque o GitHub exige exatamente esse nome de usuário.','Para eliminar a necessidade de conexão HTTPS.','Porque somente esse usuário pode executar sudo.'],a:0,e:'Um usuário dedicado melhora o isolamento e evita executar indiscriminadamente os jobs como root.'},
+      {q:'Qual é a principal função do script config.sh?',o:['Criar os arquivos YAML dos workflows.','Instalar Java, Maven, Node.js e Docker.','Iniciar permanentemente o runner como serviço.','Registrar e configurar a máquina como runner no GitHub.'],a:3,e:'O config.sh usa a URL e o token temporário para registrar a instalação no repositório ou na organização.'},
+      {q:'Para que serve o token informado em ./config.sh --url ... --token ...?',o:['Autenticar permanentemente todos os workflows.','Autorizar temporariamente o registro do runner.','Descriptografar os secrets dos jobs.','Liberar automaticamente a porta 443.'],a:1,e:'Esse token é temporário e é usado na etapa de registro. Ele não deve ser armazenado em scripts ou commits.'},
+      {q:'O runner foi iniciado com ./run.sh. O que ocorre se o terminal for fechado?',o:['O runner continua automaticamente como serviço.','O GitHub transfere o runner para outra máquina.','O processo termina e o runner pode aparecer como Offline.','O runner permanece online até o token expirar.'],a:2,e:'run.sh executa o runner de forma interativa. Fechar a sessão ou pressionar Ctrl+C encerra o processo.'},
+      {q:'Qual sequência instala e inicia o runner como serviço para o usuário actionsrunner?',o:['sudo ./svc.sh install actionsrunner; sudo ./svc.sh start','./run.sh install actionsrunner; ./run.sh start','./config.sh start; sudo ./config.sh enable','sudo ./svc.sh start; sudo ./svc.sh install actionsrunner'],a:0,e:'Primeiro o serviço é instalado para o usuário indicado; depois ele é iniciado com svc.sh start.'},
+      {q:'Um runner instalado como serviço aparece Offline. Qual deve ser uma das primeiras verificações?',o:['Excluir imediatamente o runner no GitHub.','Criar outro repositório.','Alterar todas as labels do workflow.','Executar sudo ./svc.sh status.'],a:3,e:'Verificar o estado do serviço confirma se o processo está ativo antes de investigar rede, proxy, DNS ou logs.'},
+      {q:'Um job usa runs-on: [self-hosted, linux, x64]. Qual runner pode executá-lo?',o:['Qualquer runner que possua somente self-hosted.','Um runner Linux ARM64 disponível.','Um único runner que possua as três labels.','Três runners diferentes, cada um com uma label.'],a:2,e:'As labels são cumulativas: um mesmo runner online precisa possuir self-hosted, linux e x64.'},
+      {q:'Qual diretório é normalmente usado como área de trabalho dos jobs?',o:['/opt/actions-runner/_diag','/opt/actions-runner/_work','/opt/actions-runner/bin','/opt/actions-runner/externals'],a:1,e:'_work é a área usada para repositórios e jobs. _diag armazena logs de diagnóstico.'}
+    ];
+    const letters=['A','B','C','D']; let index=0, selected=null, checked=false, score=0; const answers=[];
+    const qEl=document.getElementById('question'), oEl=document.getElementById('options'), fEl=document.getElementById('feedback'), next=document.getElementById('next');
+    function render(){selected=null;checked=false;const q=questions[index];qEl.textContent=q.q;oEl.innerHTML='';fEl.style.display='none';fEl.className='feedback';next.textContent=index===questions.length-1?'Finalizar':'Próxima';document.getElementById('counter').textContent=`Questão ${index+1} de ${questions.length}`;document.getElementById('points').textContent=`${score} ${score===1?'acerto':'acertos'}`;document.getElementById('fill').style.width=`${(index+1)/questions.length*100}%`;
+      q.o.forEach((text,i)=>{const b=document.createElement('button');b.className='option';b.innerHTML=`<span class="letter">${letters[i]}</span><span>${text}</span>`;b.onclick=()=>{if(checked)return;selected=i;[...oEl.children].forEach(x=>x.classList.remove('selected'));b.classList.add('selected')};oEl.appendChild(b)});}
+    next.onclick=()=>{if(!checked){if(selected===null){alert('Selecione uma alternativa antes de continuar.');return}checked=true;const q=questions[index],correct=selected===q.a;if(correct)score++;answers.push({selected,correct});[...oEl.children].forEach((b,i)=>{b.disabled=true;if(i===q.a)b.classList.add('correct');else if(i===selected)b.classList.add('wrong')});fEl.className=`feedback${correct?'':' bad'}`;fEl.innerHTML=`<strong>${correct?'Resposta correta.':'Resposta incorreta.'}</strong>${q.e}`;fEl.style.display='block';document.getElementById('points').textContent=`${score} ${score===1?'acerto':'acertos'}`;next.textContent=index===questions.length-1?'Ver resultado':'Próxima questão';return}if(index<questions.length-1){index++;render()}else showResult()};
+    function showResult(){document.getElementById('quiz').hidden=true;const pct=Math.round(score/questions.length*100);const msg=pct>=80?'Excelente desempenho. Você domina o conteúdo principal.':pct>=60?'Bom resultado. Revise os pontos que errou.':'Revise o guia e tente novamente para consolidar o conteúdo.';const review=questions.map((q,i)=>`<div class="review-item"><b>${i+1}. ${q.q}</b><span class="${answers[i].correct?'ok':'no'}">${answers[i].correct?'Acertou':'Errou'} - resposta: ${letters[q.a]}) ${q.o[q.a]}</span></div>`).join('');const r=document.getElementById('result');r.hidden=false;r.innerHTML=`<h1>Resultado do simulado</h1><div class="score">${score}/10</div><p>${pct}% de aproveitamento. ${msg}</p><div class="result-actions"><button class="next" onclick="location.reload()">Refazer simulado</button><button class="next secondary" onclick="window.print()">Imprimir resultado</button></div><div class="review"><h2>Revisão</h2>${review}</div>`;}
+    render();
+  </script>
+</body>
+</html>

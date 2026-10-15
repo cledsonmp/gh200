@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulado não oficial - Módulo 7 - Gerenciar ações e fluxo de trabalho - GH-200</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --surface: #ffffff;
+    --surface-2: #f3f2f1;
+    --border: #d1d1d1;
+    --border-soft: #e5e5e5;
+    --text: #201f1e;
+    --text-dim: #605e5c;
+    --text-faint: #8a8886;
+    --brand: #0078d4;
+    --brand-dark: #005a9e;
+    --ok: #107c10;
+    --ok-bg: #dff6dd;
+    --ok-border: #107c10;
+    --bad: #a4262c;
+    --bad-bg: #fde7e9;
+    --bad-border: #a4262c;
+    --mono: ui-monospace, "SFMono-Regular", "SF Mono", Consolas, monospace;
+    --sans: "Segoe UI", -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: #faf9f8;
+    color: var(--text);
+    font-family: var(--sans);
+    padding: 28px 14px 80px;
+    min-height: 100vh;
+  }
+
+  .wrap { max-width: 720px; margin: 0 auto; }
+
+  .exam-header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border-soft);
+    padding-bottom: 16px;
+    margin-bottom: 18px;
+  }
+  h1 {
+    font-size: 26px;
+    margin: 0 0 8px;
+    font-weight: 800;
+    color: var(--brand);
+  }
+  .exam-sub {
+    color: var(--text-dim);
+    font-size: 13.5px;
+    line-height: 1.55;
+    margin: 0;
+  }
+
+  .status-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 16px;
+  }
+  .status-item { font-size: 12.5px; color: var(--text-dim); }
+  .status-item b { color: var(--text); font-weight: 700; }
+  .score-pill {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 11px;
+    border-radius: 20px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+  .progress-track {
+    width: 100%;
+    height: 5px;
+    background: var(--border-soft);
+    border-radius: 4px;
+    margin-top: 10px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--brand);
+    border-radius: 4px;
+    transition: width 0.35s ease;
+  }
+
+  .q-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    opacity: 0.45;
+    transition: opacity 0.25s ease, border-color 0.25s ease;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  }
+  .q-card.active { opacity: 1; border-color: var(--brand); }
+  .q-card.done { opacity: 1; }
+  .q-card.done.correct { border-color: var(--ok-border); }
+  .q-card.done.incorrect { border-color: var(--bad-border); }
+
+  .q-body { padding: 20px 20px 18px; }
+  .q-prompt {
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.6;
+    margin: 0 0 16px;
+    color: var(--text);
+  }
+  .q-num {
+    color: var(--brand);
+    font-weight: 800;
+    margin-right: 4px;
+  }
+  .options { display: flex; flex-direction: column; gap: 9px; }
+  .opt {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    text-align: left;
+    width: 100%;
+    padding: 12px 14px;
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 13.5px;
+    line-height: 1.55;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .opt:hover:not(:disabled) {
+    border-color: var(--brand);
+    background: #f3f9fd;
+  }
+  .opt:disabled { cursor: default; }
+  .opt-radio {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    border: 2px solid var(--text-faint);
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .opt-radio::after {
+    content: "";
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    background: transparent;
+  }
+  .opt.correct-answer {
+    border-color: var(--ok-border);
+    background: var(--ok-bg);
+  }
+  .opt.correct-answer .opt-radio { border-color: var(--ok); }
+  .opt.correct-answer .opt-radio::after { background: var(--ok); }
+  .opt.wrong-answer {
+    border-color: var(--bad-border);
+    background: var(--bad-bg);
+  }
+  .opt.wrong-answer .opt-radio { border-color: var(--bad); }
+  .opt.wrong-answer .opt-radio::after { background: var(--bad); }
+  .opt.muted { opacity: 0.5; }
+
+  .explain {
+    margin-top: 14px;
+    padding: 14px 15px;
+    border-radius: 8px;
+    font-size: 13.5px;
+    line-height: 1.6;
+    display: none;
+  }
+  .explain.show { display: block; }
+  .explain.ok-box { background: var(--ok-bg); border: 1px solid var(--ok-border); }
+  .explain.bad-box { background: var(--bad-bg); border: 1px solid var(--bad-border); margin-top: 10px; }
+  .explain-tag {
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 6px;
+  }
+  .ok-box .explain-tag { color: var(--ok); }
+  .bad-box .explain-tag { color: var(--bad); }
+  .explain p { margin: 0; color: var(--text); }
+
+  .summary {
+    display: none;
+    background: var(--surface);
+    border: 1px solid var(--brand);
+    border-radius: 10px;
+    padding: 26px 22px;
+    margin-top: 18px;
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .summary.show { display: block; }
+  .summary-icon { font-size: 32px; margin-bottom: 8px; }
+  .summary-score {
+    font-family: var(--mono);
+    font-size: 34px;
+    font-weight: 800;
+    margin: 4px 0 2px;
+    color: var(--brand);
+  }
+  .summary-label { color: var(--text-dim); font-size: 12.5px; margin-bottom: 16px; font-weight: 600; letter-spacing: 0.03em; text-transform: uppercase; }
+  .summary-msg { font-size: 13.5px; color: var(--text); line-height: 1.6; max-width: 480px; margin: 0 auto 18px; }
+  .retry-btn {
+    font-size: 13px;
+    font-weight: 600;
+    color: #ffffff;
+    background: var(--brand);
+    border: none;
+    border-radius: 6px;
+    padding: 10px 20px;
+    cursor: pointer;
+  }
+  .retry-btn:hover { background: var(--brand-dark); }
+
+  @media (max-width: 480px) {
+    .status-bar { flex-direction: column; align-items: flex-start; gap: 6px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="exam-header">
+    <h1>Simulado não oficial - Módulo 7 - Gerenciar ações e fluxo de trabalho - GH-200</h1>
+    <p class="exam-sub">Foco: gerenciar ações e fluxos de trabalho (rodada 3) — políticas, metadados de modelos, e estrutura de workflows/ações reutilizáveis.</p>
+
+    <div class="status-bar">
+      <div class="status-item">Questão <b id="cur-q">0</b> de <b>10</b></div>
+      <div class="score-pill">✓ <span id="score">0</span>/<span id="answered">0</span> corretas</div>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+  </div>
+
+  <div id="quiz-container"></div>
+
+  <div class="summary" id="summary">
+    <div class="summary-icon" id="summary-icon">🎯</div>
+    <div class="summary-score" id="summary-score">0/10</div>
+    <div class="summary-label">Resultado final</div>
+    <p class="summary-msg" id="summary-msg"></p>
+    <button class="retry-btn" onclick="restartQuiz()">↻ Refazer simulado</button>
+  </div>
+
+</div>
+
+<script>
+const QUESTIONS = [
+  {
+    prompt: "Você quer restringir sua empresa para que apenas ações específicas e aprovadas possam ser usadas, em vez de liberar todas as ações do Marketplace. Qual opção, dentro da tela de política de Ações, permite configurar isso, segundo o material?",
+    options: [
+      "\"Permitir ações empresariais e não empresariais, e fluxos de trabalho reutilizáveis\", escolhendo a opção correspondente ao seu caso de uso",
+      "\"Habilitar para todas as organizações\", selecionando a opção \"nenhuma\"",
+      "A ferramenta actions-sync, que só existe para sincronizar ações no Enterprise Server",
+      "O arquivo de metadados .properties.json de um modelo de fluxo de trabalho"
+    ],
+    correct: 0,
+    why: "O material descreve exatamente essa opção: \"se você quiser habilitar apenas ações específicas para serem usadas em sua empresa, selecione Permitir ações empresariais e não empresariais, e fluxos de trabalho reutilizáveis e escolha a opção correspondente ao seu caso de uso\"."
+  },
+  {
+    prompt: "Você define iconName: \"example-icon\" no arquivo de metadados de um modelo de fluxo de trabalho. Segundo o material, o que é necessário para que esse ícone realmente apareça na lista de modelos?",
+    options: [
+      "Nenhum arquivo adicional é necessário; o GitHub gera o ícone automaticamente a partir do texto informado",
+      "Um arquivo SVG chamado example-icon.svg precisa existir, armazenado no diretório de modelos de fluxo de trabalho",
+      "Um arquivo PNG chamado example-icon.png precisa ser enviado separadamente para o Marketplace",
+      "O ícone só aparece se o modelo também tiver a categoria \"Go\" definida no parâmetro categories"
+    ],
+    correct: 1,
+    why: "O material especifica que iconName \"deve ser um ícone SVG com o mesmo nome e deve ser armazenado no diretório de modelos de fluxo de trabalho\" — ou seja, o arquivo example-icon.svg precisa existir fisicamente nesse diretório para o ícone aparecer."
+  },
+  {
+    prompt: "Um modelo de fluxo de trabalho tem categories: [\"Go\"] definido no metadata. O que esse parâmetro faz quando um usuário visualiza a lista de modelos disponíveis, segundo o material?",
+    options: [
+      "Ele impede que usuários de outras linguagens vejam esse modelo na lista, ocultando-o completamente",
+      "Ele exclui automaticamente qualquer repositório que não seja escrito em Go da lista de repositórios da organização",
+      "Modelos que correspondem à mesma linguagem do repositório do usuário são apresentados com mais destaque na lista",
+      "Ele força a conversão automática do workflow para rodar especificamente em um executor configurado para Go"
+    ],
+    correct: 2,
+    why: "O material afirma: \"quando os modelos disponíveis são visualizados por um usuário, aqueles que corresponderem à mesma linguagem serão apresentados com mais destaque\" — é um destaque visual na lista, não uma ocultação de outros modelos nem uma exclusão de repositórios."
+  },
+  {
+    prompt: "Sua organização nunca criou um modelo de fluxo de trabalho antes, e o repositório .github dela não tem um diretório chamado workflow-templates. Segundo o material, isso impede a criação de um modelo?",
+    options: [
+      "Sim, é impossível criar modelos sem que o diretório já exista previamente, sem exceção",
+      "Não, pois modelos de fluxo de trabalho não exigem nenhum diretório específico, podendo ficar em qualquer lugar do repositório",
+      "Sim, mas apenas se a organização usar o Enterprise Server; no Enterprise Cloud o diretório é criado automaticamente",
+      "Não — talvez seja preciso criar esse diretório (e até o próprio repositório .github), caso ainda não existam na organização"
+    ],
+    correct: 3,
+    why: "O material afirma: \"ambos os arquivos devem ser colocados em um repositório .github público e em um diretório chamado workflow-templates. Talvez seja preciso criá-los caso ainda não existam em sua organização\" — ou seja, a ausência do diretório (ou até do repositório) não impede a criação, apenas exige criá-los primeiro."
+  },
+  {
+    prompt: "Depois que um modelo de fluxo de trabalho é criado por uma organização, onde exatamente os membros dessa organização o encontram ao tentar criar um novo workflow, segundo o material?",
+    options: [
+      "Em Ações > Novo fluxo de trabalho > \"Fluxos de trabalho criados por [nome_da_organização]\"",
+      "Em Configurações > Segredos e variáveis > Modelos",
+      "Apenas pesquisando manualmente pelo nome do arquivo .yml na barra de busca do repositório",
+      "No GitHub Marketplace, na mesma seção onde ações públicas de terceiros são listadas"
+    ],
+    correct: 0,
+    why: "O material afirma: \"depois que um modelo de fluxo de trabalho é criado, os usuários em sua organização podem encontrá-lo em Ações > Novo fluxo de trabalho > Fluxos de trabalho criados por _your_organization_name\" — um caminho de navegação específico dentro da própria interface do GitHub."
+  },
+  {
+    prompt: "Um fluxo de trabalho reutilizável precisa de uma configuração específica de evento para poder ser chamado por outros workflows. Qual é esse evento, e onde esse arquivo de workflow reutilizável deve ser armazenado, segundo o material?",
+    options: [
+      "O evento é push, e o arquivo deve ser armazenado na raiz do repositório, fora de qualquer subpasta",
+      "O evento é workflow_call, e o arquivo deve ser armazenado em .github/workflows/",
+      "O evento é repository_dispatch, e o arquivo deve ser armazenado em .github/actions/",
+      "Não é necessário nenhum evento específico; qualquer workflow pode ser chamado por outro automaticamente"
+    ],
+    correct: 1,
+    why: "O material afirma: \"um fluxo de trabalho reutilizável é armazenado em .github/workflows/ e usa o gatilho workflow_call\" — esses dois elementos (local e evento) são exigidos especificamente para que o workflow possa ser chamado por outros."
+  },
+  {
+    prompt: "No exemplo do material, um workflow chama o fluxo de trabalho reutilizável ci-pipeline.yml, passando tanto um valor de input quanto um segredo. Qual é a estrutura correta dessa chamada, segundo o exemplo?",
+    options: [
+      "Apenas o bloco with: é necessário; segredos de um fluxo de trabalho reutilizável são sempre herdados automaticamente, sem precisar ser declarados",
+      "Apenas o bloco secrets: é necessário; inputs são sempre lidos automaticamente do repositório chamador",
+      "uses: aponta para o arquivo do workflow reutilizável (com a tag de versão), acompanhado tanto de um bloco with: (para o input node-version) quanto de um bloco secrets: (para o npm-token)",
+      "A chamada não permite passar inputs nem segredos; esses valores só podem ser configurados no próprio arquivo do workflow reutilizável"
+    ],
+    correct: 2,
+    why: "O exemplo do material mostra uses: org/reusable-workflows/.github/workflows/ci-pipeline.yml@v1, seguido de with: node-version: '16' e secrets: npm-token: ${{ secrets.NPM_TOKEN }} — ambos os blocos são necessários para passar, respectivamente, o input e o segredo exigidos pelo workflow reutilizável."
+  },
+  {
+    prompt: "Entre os benefícios de usar um fluxo de trabalho reutilizável, o material cita três especificamente. Qual das opções abaixo NÃO está entre esses três benefícios listados?",
+    options: [
+      "Garante que todos os repositórios sigam a mesma estrutura de CI/CD",
+      "Permite atualizações centralizadas sem modificar cada repositório",
+      "Reduz a redundância e a sobrecarga de manutenção",
+      "Elimina completamente a necessidade de testes automatizados em qualquer repositório"
+    ],
+    correct: 3,
+    why: "Os três benefícios citados no material são: \"garante que todos os repositórios sigam a mesma estrutura de CI/CD\", \"reduz a redundância e a sobrecarga de manutenção\", e \"permite atualizações centralizadas sem modificar cada repositório\". Eliminar a necessidade de testes automatizados não é mencionado em nenhum lugar — um fluxo reutilizável pode, inclusive, incluir testes."
+  },
+  {
+    prompt: "No exemplo de ação reutilizável \"Setup Environment\" do material, o input registry-url tem um valor default definido, mas o input node-version não tem. Qual é o valor default de registry-url, e o que isso significa na prática?",
+    options: [
+      "O valor default é \"https://registry.npmjs.org/\"; isso significa que, se o workflow chamador não especificar esse input, esse valor será usado automaticamente",
+      "O valor default é \"https://npm.pkg.github.com/\"; esse valor é obrigatório e não pode ser sobrescrito pelo workflow chamador",
+      "Não existe valor default para registry-url; o material afirma que esse input é sempre obrigatório, assim como node-version",
+      "O valor default é definido dinamicamente a partir do contexto github.repository, nunca sendo um valor fixo"
+    ],
+    correct: 0,
+    why: "O action.yml do exemplo define registry-url com required: false e default: \"https://registry.npmjs.org/\" — ou seja, esse valor é usado automaticamente quando o workflow que invoca a ação não especifica um valor diferente para esse input."
+  },
+  {
+    prompt: "O material lista três benefícios específicos de empresas que aproveitam modelos de fluxo de trabalho. Qual das opções abaixo corresponde a um desses três benefícios citados?",
+    options: [
+      "Acelerar a integração e a instalação (onboarding) para novos projetos",
+      "Eliminar permanentemente a necessidade de qualquer revisão de código em pull requests",
+      "Reduzir o número de repositórios que uma organização pode ter",
+      "Substituir completamente a necessidade de segredos armazenados no GitHub Secrets"
+    ],
+    correct: 0,
+    why: "O material lista: \"aplicar práticas recomendadas por todos os repositórios\", \"acelere a integração e a instalação para novos projetos\", e \"manter a consistência em processos de CI/CD\" — nenhuma menção a eliminar revisões de código, reduzir número de repositórios, ou substituir segredos."
+  }
+];
+
+let current = 0;
+let score = 0;
+let answered = 0;
+const userAnswers = new Array(QUESTIONS.length).fill(null);
+
+const container = document.getElementById("quiz-container");
+
+function renderAll() {
+  container.innerHTML = "";
+  QUESTIONS.forEach((q, qi) => {
+    const card = document.createElement("div");
+    card.className = "q-card" + (qi === current ? " active" : "");
+    card.id = "card-" + qi;
+
+    let optsHtml = "";
+    q.options.forEach((opt, oi) => {
+      optsHtml += `<button class="opt" data-qi="${qi}" data-oi="${oi}">
+        <span class="opt-radio"></span>
+        <span>${opt}</span>
+      </button>`;
+    });
+
+    card.innerHTML = `
+      <div class="q-body">
+        <p class="q-prompt"><span class="q-num">${qi + 1}.</span>${q.prompt}</p>
+        <div class="options">${optsHtml}</div>
+        <div class="explain ok-box" id="ok-explain-${qi}">
+          <span class="explain-tag">✓ Por que a resposta correta está certa</span>
+          <p>${q.why}</p>
+        </div>
+        <div class="explain bad-box" id="bad-explain-${qi}">
+          <span class="explain-tag">✕ Por que sua alternativa está errada</span>
+          <p id="bad-explain-text-${qi}"></p>
+        </div>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+
+  document.querySelectorAll(".opt").forEach(btn => {
+    btn.addEventListener("click", handleAnswer);
+  });
+
+  updateStatus();
+}
+
+function handleAnswer(e) {
+  const btn = e.currentTarget;
+  const qi = parseInt(btn.dataset.qi);
+  const oi = parseInt(btn.dataset.oi);
+
+  if (userAnswers[qi] !== null) return;
+
+  const q = QUESTIONS[qi];
+  const isCorrect = oi === q.correct;
+  userAnswers[qi] = oi;
+  answered++;
+  if (isCorrect) score++;
+
+  const card = document.getElementById("card-" + qi);
+  card.classList.remove("active");
+  card.classList.add("done", isCorrect ? "correct" : "incorrect");
+
+  const allOpts = card.querySelectorAll(".opt");
+  allOpts.forEach((o, idx) => {
+    o.disabled = true;
+    if (idx === q.correct) {
+      o.classList.add("correct-answer");
+    } else if (idx === oi && !isCorrect) {
+      o.classList.add("wrong-answer");
+    } else {
+      o.classList.add("muted");
+    }
+  });
+
+  document.getElementById("ok-explain-" + qi).classList.add("show");
+
+  if (!isCorrect) {
+    const badTextEl = document.getElementById("bad-explain-text-" + qi);
+    badTextEl.textContent = buildWrongExplanation(q, oi);
+    document.getElementById("bad-explain-" + qi).classList.add("show");
+  }
+
+  updateStatus();
+
+  const next = qi + 1;
+  if (next < QUESTIONS.length) {
+    current = next;
+    document.getElementById("card-" + next).classList.add("active");
+    setTimeout(() => {
+      document.getElementById("card-" + next).scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 250);
+  } else {
+    showSummary();
+  }
+}
+
+function buildWrongExplanation(q, chosenIdx) {
+  const chosenText = q.options[chosenIdx];
+  return "Você escolheu: \"" + chosenText + "\". Essa alternativa descreve algo real do material, só que associado a outra parte, parâmetro ou lista — releia a explicação acima com atenção.";
+}
+
+function updateStatus() {
+  document.getElementById("cur-q").textContent = Math.min(answered + (answered < QUESTIONS.length ? 1 : 0), QUESTIONS.length);
+  document.getElementById("score").textContent = score;
+  document.getElementById("answered").textContent = answered;
+  const pct = (answered / QUESTIONS.length) * 100;
+  document.getElementById("progress-fill").style.width = pct + "%";
+}
+
+function showSummary() {
+  const pct = Math.round((score / QUESTIONS.length) * 100);
+  document.getElementById("summary-score").textContent = score + "/" + QUESTIONS.length;
+  let icon, msg;
+  if (pct >= 85) {
+    icon = "🟢";
+    msg = "Excelente! Já são 25 questões diferentes cobertas sobre gerenciar ações e fluxos de trabalho, sem repetição.";
+  } else if (pct >= 60) {
+    icon = "🟡";
+    msg = "Bom resultado. Releia as explicações com atenção antes de seguir.";
+  } else {
+    icon = "🔴";
+    msg = "Vale reler o material sobre gerenciar ações e fluxos de trabalho com calma antes de refazer este simulado.";
+  }
+  document.getElementById("summary-icon").textContent = icon;
+  document.getElementById("summary-msg").textContent = msg;
+  document.getElementById("summary").classList.add("show");
+  setTimeout(() => {
+    document.getElementById("summary").scrollIntoView({ behavior: "smooth", block: "center" });
+  }, 300);
+}
+
+function restartQuiz() {
+  current = 0;
+  score = 0;
+  answered = 0;
+  userAnswers.fill(null);
+  document.getElementById("summary").classList.remove("show");
+  renderAll();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+renderAll();
+</script>
+</body>
+</html>
