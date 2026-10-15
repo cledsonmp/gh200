@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	<title></title>
+	<meta name="generator" content="LibreOffice 26.2.3.1 (Windows)"/>
+	<meta name="created" content="2026-10-09T12:04:20.721979000"/>
+	<meta name="changed" content="2026-10-09T12:11:50.918172500"/>
+	<style type="text/css">
+		@page { size: 21cm 29.7cm; margin: 2cm }
+		p { line-height: 115%; margin-bottom: 0.25cm; background: transparent }
+		h3 { margin-top: 0.25cm; margin-bottom: 0.21cm; background: transparent; page-break-after: avoid }
+		h3.western { font-family: "Liberation Serif", serif; font-weight: bold; font-size: 14pt }
+		h3.cjk { font-size: 14pt; font-family: "NSimSun"; font-weight: bold }
+		h3.ctl { font-family: "Lucida Sans"; font-size: 14pt; font-weight: bold }
+		blockquote { margin-left: 1cm; margin-right: 1cm; background: transparent }
+		code.western { font-family: "Liberation Mono", monospace }
+		code.cjk { font-family: "NSimSun", monospace }
+		code.ctl { font-family: "Liberation Mono", monospace }
+	</style>
+</head>
+<body lang="pt-BR" link="#000080" vlink="#800000" dir="ltr"><h3 class="western">
+Resumo prático para a prova:</h3>
+<ul>
+	<li><p><b>Quer chamar um workflow dentro de outro workflow como se
+	fosse uma função?</b> ➔ <code class="western">workflow_call</code></p></li>
+	<li><p><b>Quer que um workflow rode automaticamente assim que </b><i><b>outro
+	workflow terminar</b></i><b>?</b> ➔ <code class="western">workflow_run</code></p></li>
+	<li><p><b>Quer um botão para rodar manualmente na interface do
+	GitHub?</b> ➔ <code class="western">workflow_dispatch</code></p></li>
+	<li><p><b>Quer receber um aviso/gatilho vindo de um sistema </b><i><b>externo</b></i><b>
+	via API?</b> ➔ <code class="western">repository_dispatch</code></p></li>
+</ul>
+<p style="line-height: 100%; margin-bottom: 0cm"><br/>
+
+</p>
+<p style="line-height: 100%; margin-bottom: 0cm"><b>workflow_run</b><b>:</b>
+Ele <b>reage</b> à conclusão (ao término) de <b>outro workflow</b>.
+Ele não é chamado diretamente para executar junto; ele serve para
+escutar: <i>&quot;O workflow X terminou de rodar? Então agora o
+workflow Y pode começar&quot;</i>. Geralmente é usado para rodar
+relatórios de pós-build ou testes de segurança baseados no
+resultado de um build que acabou.</p>
+<p style="line-height: 100%; margin-bottom: 0cm"><br/>
+
+</p>
+<p style="line-height: 100%; margin-bottom: 0cm"><br/>
+
+</p>
+<p style="line-height: 100%; margin-bottom: 0cm"><br/>
+<img src="Tipos%20de%20Workflows_html_ef2da864.png" name="Figura1" align="left" width="643" height="150" border="0"/>
+Vamos
+usar uma analogia do mundo real para o <code class="western"><b>workflow_run</b></code>
+que vai fazer todo sentido.</p>
+<p>Pense no <code class="western"><b>workflow_run</b></code> como um
+<b>fofoqueiro de plantão</b> ou um <b>fiscal</b> que fica escondido
+esperando o trabalho dos outros terminar para poder agir.</p>
+<p>Ele <b>não</b> roda junto com o outro workflow e <b>não</b> é
+chamado diretamente como uma função. Ele diz assim:</p>
+<blockquote><i>&quot;Eu não quero saber o que está acontecendo
+agora. Só me avise quando o workflow <b>X</b> terminar de rodar.
+Assim que ele acabar (seja com sucesso ou erro), eu começo a fazer o
+meu trabalho.&quot;</i></blockquote>
+<h3 class="western">Exemplo Prático: Relatório de Testes e
+Segurança</h3>
+<p>Imagine que você tem dois processos separados no seu projeto:</p>
+<ol>
+	<li><p><b>O Workflow 1 (</b><code class="western"><b>ci.yml</b></code><b>):</b>
+	Roda toda vez que alguém dá um <code class="western">push</code>.
+	Ele compila o código e roda os testes unitários. Demora 10
+	minutos.</p></li>
+	<li><p><b>O Workflow 2 (</b><code class="western"><b>seguranca.yml</b></code><b>):</b>
+	É um scanner pesado que procura vulnerabilidades no código. Como
+	ele é muito pesado, você <b>não</b> quer que ele rode junto com o
+	CI para não deixar o desenvolvedor esperando.</p></li>
+</ol>
+<p>É aqui que entra o <code class="western"><b>workflow_run</b></code>!
+Você configura o <code class="western">seguranca.yml</code> para
+rodar <b>somente</b> após o <code class="western">ci.yml</code>
+terminar com sucesso.</p>
+<p>Veja como fica o código do <b>Workflow 2 (</b><code class="western"><b>seguranca.yml</b></code><b>)</b>:</p>
+<p>name: Scanner de Segurança Pós-Build</p>
+<p><br/>
+<br/>
+
+</p>
+<p>on:</p>
+<p>  workflow_run:</p>
+<p>    workflows: [&quot;CI Principal&quot;]  # Nome exato do
+Workflow 1 que ele vai fiscalizar</p>
+<p>    types:</p>
+<p>      - completed               # Dispara assim que o Workflow 1
+for concluído (terminar)</p>
+<p><br/>
+<br/>
+
+</p>
+<p>jobs:</p>
+<p>  analisar-vulnerabilidades:</p>
+<p>    runs-on: ubuntu-latest</p>
+<p>    steps:</p>
+<p>      - name: Rodando scanner de segurança</p>
+<p>run: echo &quot;O CI Principal acabou! Agora vou fazer a varredura
+de segurança.&quot;</p>
+<p><br/>
+<br/>
+
+</p>
+<p><br/>
+<br/>
+
+</p>
+<h3 class="western">A Grande Vantagem do <code class="western">workflow_run</code>
+(O Superpoder dele)</h3>
+<p>Por que alguém usaria o <code class="western">workflow_run</code>
+em vez de colocar tudo no mesmo arquivo?</p>
+<p>Por causa da <b>Segurança (Permissões)</b>. No GitHub Actions,
+se o seu repositório é público, workflows disparados por
+<code class="western">pull_request</code> de pessoas de fora
+(contribuidores externos) rodam com <b>permissões restritas</b> para
+evitar que alguém mal intencionado roube seus tokens e senhas de
+acesso à produção por exemplo.</p>
+<p>Porém, o <code class="western"><b>workflow_run</b></code> roda na
+<b>branch padrão/principal</b> e tem acesso a tokens e segredos
+sensíveis (<code class="western">secrets</code>) com segurança,
+porque ele está apenas fiscalizando algo que já rodou e foi
+aprovado na base oficial.</p>
+<h3 class="western" style="line-height: 115%; margin-top: 0cm; margin-bottom: 0.25cm">
+Resumo para fixar:</h3>
+<ul>
+	<li><p><code class="western"><b>workflow_call</b></code>: É uma
+	<b>subrotina / função</b>. Um workflow chama o outro e espera o
+	resultado ali na mesma hora.</p></li>
+	<li><p><code class="western"><b>workflow_run</b></code>: É um
+	<b>observador / pós-processo</b>. Ele fica assistindo de camarote.
+	Quando o workflow monitorado <b>termina (</b><code class="western"><b>completed</b></code><b>)</b>,
+	ele acorda e começa a rodar sozinho.</p></li>
+</ul>
+</body>
+</html>

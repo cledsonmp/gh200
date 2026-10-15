@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	<title></title>
+	<meta name="generator" content="LibreOffice 26.2.3.1 (Windows)"/>
+	<meta name="created" content="2026-10-10T11:43:05.113145200"/>
+	<meta name="changed" content="2026-10-10T12:00:54.551256200"/>
+	<style type="text/css">
+		@page { size: 21cm 29.7cm; margin: 2cm }
+		p { line-height: 115%; margin-bottom: 0.25cm; background: transparent; background: transparent }
+		h3 { margin-top: 0.25cm; margin-bottom: 0.21cm; background: transparent; background: transparent; page-break-after: avoid }
+		h3.western { font-family: "Liberation Serif", serif; font-weight: bold; font-size: 14pt }
+		h3.cjk { font-size: 14pt; font-family: "NSimSun"; font-weight: bold }
+		h3.ctl { font-family: "Lucida Sans"; font-size: 14pt; font-weight: bold }
+		pre { background: transparent; background: transparent }
+		pre.western { font-family: "Liberation Mono", monospace; font-size: 10pt }
+		pre.cjk { font-size: 10pt; font-family: "NSimSun", monospace }
+		pre.ctl { font-family: "Liberation Mono", monospace; font-size: 10pt }
+		code.western { font-family: "Liberation Mono", monospace }
+		code.cjk { font-family: "NSimSun", monospace }
+		code.ctl { font-family: "Liberation Mono", monospace }
+		a:link { color: #000080; text-decoration: underline }
+		a:visited { color: #800000; text-decoration: underline }
+	</style>
+</head>
+<body lang="pt-BR" link="#000080" vlink="#800000" dir="ltr"><h3 class="western">
+<font face="Google Sans, sans-serif">O Problema: O Runner Não Roda
+</font><code class="western"><font face="Google Sans Text, sans-serif">npm
+install</font></code> <font face="Google Sans, sans-serif">para Você</font></h3>
+<p style="line-height: 114%"><font face="Google Sans Text, sans-serif">Quando
+você desenvolve uma Action em JavaScript, é comum utilizar
+bibliotecas auxiliares oficiais, como o </font><code class="western"><font face="Google Sans Text, sans-serif">@actions/core</font></code>
+<font face="Google Sans Text, sans-serif">e </font><code class="western"><font face="Google Sans Text, sans-serif">@actions/github</font></code><font face="Google Sans Text, sans-serif">,
+para manipular entradas, saídas e logs.</font></p>
+<p style="line-height: 114%"><a name="p-rc_7bc3928bd270acf6-95"></a><font face="Google Sans Text, sans-serif">No
+entanto, quando um repositório consumidor utiliza a sua action
+através de uma referência externa (ex: </font><code class="western"><font face="Google Sans Text, sans-serif">uses:
+seu-usuario/sua-action@v1</font></code><font face="Google Sans Text, sans-serif">),
+</font><font face="Google Sans Text, sans-serif"><b>o GitHub Actions
+não executa um </b></font><code class="western"><font face="Google Sans Text, sans-serif"><b>npm
+install</b></font></code> <font face="Google Sans Text, sans-serif">dentro
+da pasta da sua action. O </font><font face="Google Sans Text, sans-serif"><i>runner</i></font>
+<font face="Google Sans Text, sans-serif">apenas localiza o arquivo
+de entrada (</font><code class="western"><font face="Google Sans Text, sans-serif">entrypoint</font></code><font face="Google Sans Text, sans-serif">)
+declarado na propriedade </font><code class="western"><font face="Google Sans Text, sans-serif">main</font></code>
+<font face="Google Sans Text, sans-serif">do seu arquivo de
+configuração (</font><code class="western"><font face="Google Sans Text, sans-serif">action.yml</font></code><font face="Google Sans Text, sans-serif">)
+— por exemplo, apontando para </font><code class="western"><font face="Google Sans Text, sans-serif">dist/index.js</font></code>
+— <font face="Google Sans Text, sans-serif">e tenta executá-lo
+imediatamente. </font>
+</p>
+<p style="line-height: 114%"><font face="Google Sans Text, sans-serif">Se
+as dependências do projeto não estiverem fisicamente presentes e
+disponíveis junto a esse arquivo, o Node.js falhará na hora com o
+erro clássico:</font></p>
+<p style="line-height: 114%"><code class="western"><font face="Google Sans Text, sans-serif">Cannot
+find module @actions/core</font></code><font face="Google Sans Text, sans-serif">.</font></p>
+<h3 class="western" style="line-height: 114%; margin-top: 0cm; margin-bottom: 0.25cm">
+<font face="Google Sans, sans-serif">A Solução: O Empacotamento em
+<font face="Google Sans Text, sans-serif"><i>Bundle</i></font></font></h3>
+<p style="line-height: 114%"><font face="Google Sans Text, sans-serif">Para
+que a action funcione perfeitamente sem exigir que o consumidor
+configure ou instale nada, o autor da action deve adotar a prática
+indicada na alternativa <b>A</b>:</font></p>
+<ol>
+	<li><p style="line-height: 114%; border: none; padding: 0cm"><a name="p-rc_7bc3928bd270acf6-96"></a>
+	<font face="Google Sans Text, sans-serif"><b>Gerar um Bundle
+	Autossuficiente:</b></font> <font face="Google Sans Text, sans-serif">Durante
+	o processo de desenvolvimento (ou build) da action, utiliza-se uma
+	ferramenta de empacotamento (como o </font><code class="western"><font face="Google Sans Text, sans-serif">@vercel/ncc</font></code><font face="Google Sans Text, sans-serif">,
+	</font><code class="western"><font face="Google Sans Text, sans-serif">esbuild</font></code>
+	<font face="Google Sans Text, sans-serif">ou </font><code class="western"><font face="Google Sans Text, sans-serif">webpack</font></code><font face="Google Sans Text, sans-serif">).
+	Essa ferramenta pega o seu código-fonte e todas as dependências do
+	</font><code class="western"><font face="Google Sans Text, sans-serif">node_modules</font></code>
+	<font face="Google Sans Text, sans-serif">e as compacta em </font><font face="Google Sans Text, sans-serif"><b>um
+	único arquivo consolidado</b></font> <font face="Google Sans Text, sans-serif">(o
+	</font><font face="Google Sans Text, sans-serif"><i>bundle</i></font><font face="Google Sans Text, sans-serif">).
+	</font>
+	</p></li>
+	<li><p style="line-height: 114%; border: none; padding: 0cm"><a name="p-rc_7bc3928bd270acf6-97"></a>
+	<font face="Google Sans Text, sans-serif"><b>Versionar os Artefatos
+	Compilados:</b></font> <font face="Google Sans Text, sans-serif">É
+	responsabilidade do autor garantir que esse arquivo final gerado
+	(geralmente salvo em </font><code class="western"><font face="Google Sans Text, sans-serif">dist/index.js</font></code><font face="Google Sans Text, sans-serif">)
+	seja devidamente commitado e publicado no repositório da action.
+	Dessa forma, quando o </font><font face="Google Sans Text, sans-serif"><i>runner</i></font>
+	<font face="Google Sans Text, sans-serif">baixar a action para
+	executá-la, todo o código e suas dependências já estarão
+	empacotados e prontos para rodar. </font>
+	</p></li>
+</ol>
+<h3 class="western"><font face="Google Sans, sans-serif">Onde entram
+o </font><code class="western"><font face="Google Sans Text, sans-serif">@vercel/ncc</font></code><font face="Google Sans, sans-serif">,
+o </font><code class="western"><font face="Google Sans Text, sans-serif">esbuild</font></code>
+<font face="Google Sans, sans-serif">ou o </font><code class="western"><font face="Google Sans Text, sans-serif">webpack</font></code><font face="Google Sans, sans-serif">?</font></h3>
+<p style="line-height: 114%"><a name="p-rc_9079d1277663cf9e-101"></a><font face="Google Sans Text, sans-serif">Lembra
+que o GitHub Actions </font><font face="Google Sans Text, sans-serif"><b>não
+roda </b></font><code class="western"><font face="Google Sans Text, sans-serif"><b>npm
+install</b></font></code> <font face="Google Sans Text, sans-serif">quando
+baixa a sua action na máquina do usuário? Ele apenas lê o seu
+arquivo </font><code class="western"><font face="Google Sans Text, sans-serif">action.yml</font></code>
+<font face="Google Sans Text, sans-serif">e executa diretamente o
+arquivo principal apontado pela propriedade </font><code class="western"><font face="Google Sans Text, sans-serif">main</font></code>
+<font face="Google Sans Text, sans-serif">(por exemplo, </font><code class="western"><font face="Google Sans Text, sans-serif">main:
+dist/index.js</font></code><font face="Google Sans Text, sans-serif">).
+</font>
+</p>
+<p style="line-height: 114%"><font face="Google Sans Text, sans-serif">Como
+o seu código-fonte usa dependências externas (como
+</font><code class="western"><font face="Google Sans Text, sans-serif">require('@actions/core')</font></code><font face="Google Sans Text, sans-serif">),
+se você subir apenas os arquivos soltos, o Node.js vai quebrar
+dizendo que o módulo não existe. É aqui que entram essas
+ferramentas de </font><font face="Google Sans Text, sans-serif"><i>bundling</i></font>
+<font face="Google Sans Text, sans-serif">(empacotamento).</font></p>
+<p style="line-height: 100%; margin-bottom: 0cm"><br/>
+
+</p>
+<h3 class="western">Passo a Passo Prático de como usar o <code class="western">@vercel/ncc</code>
+(o mais recomendado pelo próprio GitHub):</h3>
+<ol>
+	<li><p><b>Você escreve o código da action normalmente</b> usando
+	vários arquivos na pasta <code class="western">src/</code> e
+	instalando as dependências no seu <code class="western">package.json</code>:</p></li>
+</ol>
+<p style="line-height: 100%; margin-bottom: 0cm"><img src="O%20Empacotamento%20em%20Bundle_html_a2d817c9.png" name="Figura1" align="left" width="405" height="190" border="0"/>
+<br/>
+
+</p>
+<h3 class="western" style="line-height: 114%; margin-top: 0cm; margin-bottom: 0.25cm">
+<br/>
+<br/>
+
+</h3>
+<h3 class="western" style="line-height: 114%; margin-top: 0cm; margin-bottom: 0.25cm">
+<br/>
+<br/>
+
+</h3>
+<h3 class="western" style="line-height: 114%; margin-top: 0cm; margin-bottom: 0.25cm">
+<br/>
+<br/>
+
+</h3>
+<h3 class="western" style="line-height: 114%; margin-top: 0cm; margin-bottom: 0.25cm">
+<br/>
+<br/>
+
+</h3>
+<h3 class="western" style="line-height: 114%; margin-top: 0cm; margin-bottom: 0.25cm">
+<br/>
+<br/>
+
+</h3>
+<h3 class="western" style="line-height: 114%; margin-top: 0cm; margin-bottom: 0.25cm">
+<br/>
+<br/>
+
+</h3>
+<p style="line-height: 114%"><font face="Google Sans, sans-serif"><b>Você
+roda o empacotador antes de publicar:</b></font><font face="Google Sans, sans-serif">
+Em vez de subir a pasta </font><code class="western"><font face="Google Sans, sans-serif">node_modules</font></code><font face="Google Sans, sans-serif">
+inteira para o repositório (o que é pesado e má prática), você
+usa o </font><code class="western"><font face="Google Sans, sans-serif">@vercel/ncc</font></code><font face="Google Sans, sans-serif">
+para compilar tudo em </font><font face="Google Sans, sans-serif"><b>um
+único arquivo</b></font><font face="Google Sans, sans-serif">
+autossuficiente:</font></p>
+<p style="line-height: 114%"><font face="Google Sans, sans-serif">Bash</font></p>
+<pre class="western" style="line-height: 114%; margin-bottom: 0.25cm"><code class="western"><font face="Google Sans, sans-serif">npx ncc build src/index.js -o dist</font></code></pre>
+<ul>
+	<li><p style="line-height: 114%"><font face="Google Sans, sans-serif"><b>O
+	que o </b></font><code class="western"><font face="Google Sans, sans-serif"><b>@vercel/ncc</b></font></code><font face="Google Sans, sans-serif">
+	</font><font face="Google Sans, sans-serif"><b>(ou esbuild/webpack)
+	faz por baixo do pano?</b></font><font face="Google Sans, sans-serif">
+	Ele lê o seu código, busca o código do </font><code class="western"><font face="Google Sans, sans-serif">@actions/core</font></code><font face="Google Sans, sans-serif">
+	dentro da pasta </font><code class="western"><font face="Google Sans, sans-serif">node_modules</font></code><font face="Google Sans, sans-serif">,
+	e </font><font face="Google Sans, sans-serif"><b>injeta tudo dentro
+	de um único arquivo final</b></font><font face="Google Sans, sans-serif">
+	chamado </font><code class="western"><font face="Google Sans, sans-serif">dist/index.js</font></code><font face="Google Sans, sans-serif">.</font></p></li>
+</ul>
+<ul>
+	<li><p style="line-height: 114%"><font face="Google Sans, sans-serif"><b>O
+	resultado que você comita no repositório da Action:</b></font><font face="Google Sans, sans-serif">
+	O arquivo </font><code class="western"><font face="Google Sans, sans-serif">dist/index.js</font></code><font face="Google Sans, sans-serif">
+	gerado fica gigante e feio, mas dentro dele </font><font face="Google Sans, sans-serif"><b>já
+	estão o seu código e todas as dependências embutidas</b></font><font face="Google Sans, sans-serif">.</font></p></li>
+</ul>
+<p style="line-height: 114%"><font face="Google Sans Text, sans-serif">Quando
+o usuário do seu workflow chama a sua action (</font><code class="western"><font face="Google Sans Text, sans-serif">uses:
+seu-usuario/sua-action@v1</font></code><font face="Google Sans Text, sans-serif">),
+o GitHub baixa esse arquivo pronto em </font><code class="western"><font face="Google Sans Text, sans-serif">dist/index.js</font></code><font face="Google Sans Text, sans-serif">,
+o Node.js o executa imediatamente, e ele roda sem precisar de nenhum
+</font><code class="western"><font face="Google Sans Text, sans-serif">npm
+install</font></code><font face="Google Sans Text, sans-serif">!</font><font face="Google Sans, sans-serif">
+</font>
+</p>
+<p style="line-height: 114%"><font face="Google Sans, sans-serif"><b>Package.json</b></font><font face="Google Sans, sans-serif"><br/>
+<br/>
+Como
+o empacotador (como o </font><code class="western"><font face="Google Sans, sans-serif">@vercel/ncc</font></code><font face="Google Sans, sans-serif">)
+vai ler o seu código-fonte, juntar tudo o que você precisa e
+transformar em um único arquivo final (</font><code class="western"><font face="Google Sans, sans-serif">dist/index.js</font></code><font face="Google Sans, sans-serif">),
+o seu </font><code class="western"><font face="Google Sans, sans-serif">package.json</font></code><font face="Google Sans, sans-serif">
+acaba tendo uma divisão muito importante: as dependências de
+produção vão para as </font><font face="Google Sans, sans-serif"><b>devDependencies</b></font><font face="Google Sans, sans-serif">
+(porque o código final já vai embutido no bundle) e você usa um
+script de </font><code class="western"><font face="Google Sans, sans-serif">build</font></code><font face="Google Sans, sans-serif">
+para gerar o arquivo.</font></p>
+<p style="line-height: 114%"><font face="Google Sans, sans-serif">Veja
+como fica um exemplo real de </font><code class="western"><font face="Google Sans, sans-serif">package.json</font></code><font face="Google Sans, sans-serif">
+para uma JavaScript Action:</font></p>
+<p style="line-height: 114%"><font face="Google Sans, sans-serif">JSON</font><img src="O%20Empacotamento%20em%20Bundle_html_839348e3.gif" name="Figura2" align="left" width="452" height="258" border="0"/>
+
+</p>
+<p style="line-height: 114%"><br/>
+<br/>
+
+</p>
+<h3 class="western" style="line-height: 114%; margin-top: 0cm; margin-bottom: 0.25cm">
+<br/>
+<br/>
+
+</h3>
+<h3 class="western" style="line-height: 114%; margin-top: 0cm; margin-bottom: 0.25cm">
+<br/>
+<br/>
+
+</h3>
+<h3 class="western" style="line-height: 114%; margin-top: 0cm; margin-bottom: 0.25cm">
+<br/>
+<br/>
+
+</h3>
+<h3 class="western" style="line-height: 114%; margin-top: 0cm; margin-bottom: 0.25cm">
+<br/>
+<br/>
+
+</h3>
+<h3 class="western" style="line-height: 114%; margin-top: 0cm; margin-bottom: 0.25cm">
+<br/>
+<br/>
+
+</h3>
+<h3 class="western" style="line-height: 114%; margin-top: 0cm; margin-bottom: 0.25cm">
+<br/>
+<br/>
+
+</h3>
+<h3 class="western" style="line-height: 114%; margin-top: 0cm; margin-bottom: 0.25cm">
+<br/>
+<br/>
+
+</h3>
+<h3 class="western" style="line-height: 114%; margin-top: 0cm; margin-bottom: 0.25cm">
+<br/>
+<br/>
+
+</h3>
+<h3 class="western" style="line-height: 114%; margin-top: 0cm; margin-bottom: 0.25cm">
+<br/>
+<br/>
+
+</h3>
+<h3 class="western" style="line-height: 114%; margin-top: 0cm; margin-bottom: 0.25cm">
+O que cada parte significa aqui?</h3>
+<ol>
+	<li><p style="line-height: 114%"><code class="western"><b>&quot;main&quot;:
+	&quot;dist/index.js&quot;</b></code>: É o ponteiro que o GitHub
+	Actions lê no seu <code class="western">action.yml</code> (através
+	de <code class="western">main: dist/index.js</code>). Ele diz ao
+	runner exatamente onde está o arquivo pronto para ser executado.</p></li>
+	<li><p style="line-height: 114%"><code class="western"><b>&quot;devDependencies&quot;</b></code>:
+	O <code class="western">@vercel/ncc</code> e bibliotecas como
+	<code class="western">@actions/core</code> ficam aqui. Durante o
+	desenvolvimento, você precisa delas instaladas localmente para
+	programar e compilar. Mas quando o <code class="western">ncc build</code>
+	roda, ele pega o conteúdo dessas bibliotecas, &quot;succiona&quot;
+	para dentro do arquivo de saída (<code class="western">dist/index.js</code>)
+	e deixa tudo pronto.</p></li>
+	<li><p style="line-height: 114%"><code class="western"><b>&quot;scripts&quot;:
+	{ &quot;build&quot;: ... }</b></code>: É o comando que você roda
+	no seu terminal (ou automatiza em um workflow de CI/CD próprio da
+	sua action) antes de enviar uma nova versão para o GitHub. Quando
+	você roda <code class="western">npm run build</code>, ele gera o
+	arquivo empacotado na pasta <code class="western">dist/</code>.</p></li>
+</ol>
+<p style="line-height: 114%">É por isso que, quando você for
+commitar os arquivos para o repositório da sua action, você envia a
+pasta <code class="western">src/</code>, o <code class="western">package.json</code>,
+mas <b>também garante que a pasta </b><code class="western"><b>dist/</b></code><b>
+gerada pelo build esteja commitada</b>, pois é ela que o GitHub vai
+baixar e executar direto!</p>
+<p style="line-height: 114%"><br/>
+<br/>
+
+</p>
+</body>
+</html>

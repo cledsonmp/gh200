@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	<title></title>
+	<meta name="generator" content="LibreOffice 26.2.3.1 (Windows)"/>
+	<meta name="created" content="2026-10-10T15:00:31.715653200"/>
+	<meta name="changed" content="2026-10-10T15:01:42.093775700"/>
+	<style type="text/css">
+		@page { size: 21cm 29.7cm; margin: 2cm }
+		p { line-height: 115%; margin-bottom: 0.25cm; background: transparent }
+		h3 { margin-top: 0.25cm; margin-bottom: 0.21cm; background: transparent; page-break-after: avoid }
+		h3.western { font-family: "Liberation Serif", serif; font-weight: bold; font-size: 14pt }
+		h3.cjk { font-size: 14pt; font-family: "NSimSun"; font-weight: bold }
+		h3.ctl { font-family: "Lucida Sans"; font-size: 14pt; font-weight: bold }
+		pre { background: transparent }
+		pre.western { font-family: "Liberation Mono", monospace; font-size: 10pt }
+		pre.cjk { font-size: 10pt; font-family: "NSimSun", monospace }
+		pre.ctl { font-family: "Liberation Mono", monospace; font-size: 10pt }
+		h4 { margin-top: 0.21cm; margin-bottom: 0.21cm; background: transparent; page-break-after: avoid }
+		h4.western { font-family: "Liberation Serif", serif; font-weight: bold; font-size: 12pt }
+		h4.cjk { font-size: 12pt; font-family: "NSimSun"; font-weight: bold }
+		h4.ctl { font-family: "Lucida Sans"; font-size: 12pt; font-weight: bold }
+		code.western { font-family: "Liberation Mono", monospace }
+		code.cjk { font-family: "NSimSun", monospace }
+		code.ctl { font-family: "Liberation Mono", monospace }
+	</style>
+</head>
+<body lang="pt-BR" link="#000080" vlink="#800000" dir="ltr"><p>Para
+compreendermos o paradigma das <b>Immutable Actions</b> (ações
+imutáveis) e a sua transição no ecossistema do GitHub Actions na
+prática, vejamos como a abordagem muda da forma clássica para a
+forma moderna baseada em OCI (<i>Open Container Initiative</i>) e no
+GHCR (<i>GitHub Container Registry</i>).</p>
+<h3 class="western">1. O Modelo Tradicional (Baseado em Git e
+Suscetível a Riscos)</h3>
+<p>No modelo clássico, quando consome uma action de terceiros, o seu
+workflow aponta diretamente para um repositório do GitHub utilizando
+uma tag ou branch:</p>
+<p>YAML</p>
+<pre class="western"><code class="western">steps:</code>
+<code class="western">  </code><code class="western">- name: Executar Action de Terceiros (Modo Tradicional)</code>
+<code class="western">    </code><code class="western">uses: meu-usuario/minha-acao@v1</code></pre>
+<ul>
+	<li><p><b>O Problema Prático:</b> A tag <code class="western">v1</code>
+	é apenas um ponteiro móvel no Git. Um mantedor mal-intencionado
+	(ou uma conta comprometida) pode apagar a tag <code class="western">v1</code>,
+	alterá-la e apontá-la para um novo commit contendo código
+	malicioso. Na execução seguinte, o seu pipeline baixará o novo
+	código sem que o YAML tenha sido modificado.</p></li>
+</ul>
+<h3 class="western">2. O Paradigma Moderno de Ações Imutáveis (OCI
+/ GHCR)</h3>
+<p>Para resolver esse problema de segurança na cadeia de
+abastecimento, o GitHub passou a suportar a distribuição de actions
+empacotadas como imagens OCI (o mesmo padrão de containers)
+armazenadas no GHCR.</p>
+<p>Na prática, o paradigma funciona com um mecanismo de <b>resolução
+flexível</b>:</p>
+<ol>
+	<li><p><b>Tentativa de Pacote Imutável:</b> Quando o <i>runner</i>
+	processa a action, ele verifica se existe uma versão empacotada
+	como pacote imutável e assinado criptograficamente no registro de
+	containers.</p></li>
+	<li><p><b>Fallback / Resolução Tradicional:</b> Caso o pacote
+	imutável não esteja disponível para aquela action específica, o
+	sistema recorre automaticamente à resolução tradicional baseada
+	no repositório Git.</p></li>
+</ol>
+<h4 class="western">Como fica na prática o consumo seguro?</h4>
+<p>Para garantir imutabilidade absoluta no modelo tradicional, os
+engenheiros costumam fixar o <b>SHA completo do commit</b> em vez de
+usar tags:</p>
+<p>YAML</p>
+<pre class="western"><code class="western">steps:</code>
+<code class="western">  </code><code class="western">- name: Executar Action com SHA Fixo (Imutabilidade via Git)</code>
+<code class="western">    </code><code class="western">uses: meu-usuario/minha-acao@</code><code class="western"><span style="background: #ffff00">a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0</span></code></pre><p>
+E no paradigma moderno de pacotes imutáveis publicados como OCI, o
+runtime e os <i>runners</i> hospedados gerenciam essa camada de
+pacotes assinados de forma transparente, garantindo que o artefato
+executado seja criptograficamente idêntico ao que foi publicado, sem
+que tags possam ser alteradas sorrateiramente.</p>
+<p style="line-height: 100%; margin-bottom: 0cm"><br/>
+
+</p>
+</body>
+</html>

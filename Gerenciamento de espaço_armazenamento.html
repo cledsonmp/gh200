@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	<title></title>
+	<meta name="generator" content="LibreOffice 26.2.3.1 (Windows)"/>
+	<meta name="created" content="2026-10-09T18:09:50.666710600"/>
+	<meta name="changed" content="2026-10-09T18:14:58.272006900"/>
+	<style type="text/css">
+		@page { size: 21cm 29.7cm; margin: 2cm }
+		p { line-height: 115%; margin-bottom: 0.25cm; background: transparent }
+		h3 { margin-top: 0.25cm; margin-bottom: 0.21cm; background: transparent; page-break-after: avoid }
+		h3.western { font-family: "Liberation Serif", serif; font-weight: bold; font-size: 14pt }
+		h3.cjk { font-size: 14pt; font-family: "NSimSun"; font-weight: bold }
+		h3.ctl { font-family: "Lucida Sans"; font-size: 14pt; font-weight: bold }
+		h4 { margin-top: 0.21cm; margin-bottom: 0.21cm; background: transparent; page-break-after: avoid }
+		h4.western { font-family: "Liberation Serif", serif; font-weight: bold; font-size: 12pt }
+		h4.cjk { font-size: 12pt; font-family: "NSimSun"; font-weight: bold }
+		h4.ctl { font-family: "Lucida Sans"; font-size: 12pt; font-weight: bold }
+		code.western { font-family: "Liberation Mono", monospace }
+		code.cjk { font-family: "NSimSun", monospace }
+		code.ctl { font-family: "Liberation Mono", monospace }
+	</style>
+</head>
+<body lang="pt-BR" link="#000080" vlink="#800000" dir="ltr"><p>Gerenciamento
+de espaço/armazenamento</p>
+<p><br/>
+<br/>
+
+</p>
+<p>Vamos destrinchar isso com um <b>exemplo prático do dia a dia</b>
+de um desenvolvedor para ficar bem visual.</p>
+<p>Imagine que o seu projeto no GitHub Actions rodou um build hoje e
+gerou <b>três coisas principais</b>:</p>
+<ol>
+	<li><p><b>O Histórico (Run):</b> O registro que diz: <i>&quot;O
+	workflow </i><code class="western"><i>CI Pipeline</i></code><i>
+	rodou hoje às 14h, foi disparado por um </i><code class="western"><i>push</i></code><i>
+	na branch </i><code class="western"><i>main</i></code><i> e terminou
+	com </i><i><b>sucesso</b></i><i>.&quot;</i></p></li>
+	<li><p><b>Os Logs:</b> O textão com todas as linhas que apareceram
+	na tela preta (ex: <code class="western">npm install baixando
+	pacotes...</code>, <code class="western">compilando arquivos...</code>,
+	<code class="western">testes finalizados com sucesso</code>).</p></li>
+	<li><p><b>O Artefato:</b> Um arquivo compactado chamado
+	<code class="western">relatorio-de-cobertura.zip</code> que tem 50
+	Megabytes de relatórios de testes.</p></li>
+</ol>
+<h3 class="western">O Problema: O Armazenamento Está Lotando</h3>
+<p>O espaço do seu repositório está quase no limite por causa de
+arquivos acumulados. Você decide escrever um script usando a API
+REST do GitHub para fazer uma faxina, mas cada &quot;gaveta&quot;
+exige um comando diferente. Veja o que acontece em cada escolha:</p>
+<h4 class="western">Cenário 1: Você quer apagar apenas o arquivo
+pesado, mantendo o histórico</h4>
+<p>Se você quer economizar espaço rápido apagando <b>só o arquivo
+</b><code class="western"><b>.zip</b></code>, mas quer <b>manter</b>
+o registro de que o build aconteceu e os logs para auditoria, você
+usa o endpoint de artefatos:</p>
+<ul>
+	<li><p><b>Comando:</b> <code class="western">DELETE
+	/repos/MINHA-ORG/MEU-REPO/actions/artifacts/12345</code> (onde <code class="western">12345</code>
+	é o ID daquele <code class="western">.zip</code>).</p></li>
+	<li><p><b>O resultado:</b> O arquivo <code class="western">relatorio-de-cobertura.zip</code>some
+	e o espaço é liberado. Porém, se você entrar no GitHub, o
+	histórico do workflow (<code class="western">run</code>) continua
+	lá bonitinho, com o status de sucesso e os logs intactos. É uma
+	<b>cirurgia precisa</b>.</p></li>
+</ul>
+<h4 class="western">Cenário 2: Você quer apagar apenas o textão
+dos logs</h4>
+<p>Se o seu problema não é espaço de arquivos, mas você quer
+limpar os registros de texto de uma rodada específica por
+privacidade:</p>
+<ul>
+	<li><p><b>Comando:</b> <code class="western">DELETE
+	/repos/MINHA-ORG/MEU-REPO/actions/runs/67890/logs</code></p></li>
+	<li><p><b>O resultado:</b> Os textos da tela preta somem, mas o
+	artefato e o registro geral de que a execução ocorreu continuam
+	lá.</p></li>
+</ul>
+<h4 class="western">Cenário 3: Você quer deletar a execução
+inteira (<i>Run</i>)</h4>
+<p>Se você decidir apagar o registro completo da rodada:</p>
+<ul>
+	<li><p><b>Comando:</b> <code class="western">DELETE
+	/repos/MINHA-ORG/MEU-REPO/actions/runs/67890</code></p></li>
+	<li><p><b>O resultado:</b> Aqui é &quot;tudo ou nada&quot;. O
+	histórico principal da rodada é apagado, arrastando junto os logs
+	e qualquer vínculo com os artefatos daquela execução.</p></li>
+</ul>
+<h3 class="western">E se em vez de apagar manualmente, eu quiser
+mudar a regra geral?</h3>
+<p>Digamos que você não quer ficar rodando scripts de <code class="western">DELETE</code>
+todo dia. Você quer que o próprio GitHub apague os arquivos
+automaticamente após 7 dias para sempre.</p>
+<p>Para mudar essa <b>regra/política global</b> (e não apagar um
+arquivo individual agora), você não usa <code class="western">DELETE</code>.
+Você usa o método <code class="western"><b>PUT</b></code> para
+atualizar as configurações de permissão e retenção da
+organização ou do repositório:</p>
+<ul>
+	<li><p><b>Comando:</b> <code class="western">PUT
+	/repos/MINHA-ORG/MEU-REPO/actions/permissions/artifact-and-log-retention</code>
+	passando no corpo da requisição que o limite de dias (<code class="western">days</code>)
+	agora é 7.</p></li>
+</ul>
+<p>Precisamos saber escolher a &quot;gaveta&quot; certa !</p>
+<p style="line-height: 100%; margin-bottom: 0cm"><br/>
+
+</p>
+</body>
+</html>

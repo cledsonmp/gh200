@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	<title></title>
+	<meta name="generator" content="LibreOffice 26.2.3.1 (Windows)"/>
+	<meta name="created" content="2026-10-09T23:14:05.179150000"/>
+	<meta name="changed" content="2026-10-09T23:16:39.560232600"/>
+	<style type="text/css">
+		@page { size: 21cm 29.7cm; margin: 2cm }
+		p { line-height: 115%; margin-bottom: 0.25cm; background: transparent }
+		h3 { margin-top: 0.25cm; margin-bottom: 0.21cm; background: transparent; page-break-after: avoid }
+		h3.western { font-family: "Liberation Serif", serif; font-weight: bold; font-size: 14pt }
+		h3.cjk { font-size: 14pt; font-family: "NSimSun"; font-weight: bold }
+		h3.ctl { font-family: "Lucida Sans"; font-size: 14pt; font-weight: bold }
+		blockquote { margin-left: 1cm; margin-right: 1cm; background: transparent }
+		code.western { font-family: "Liberation Mono", monospace }
+		code.cjk { font-family: "NSimSun", monospace }
+		code.ctl { font-family: "Liberation Mono", monospace }
+	</style>
+</head>
+<body lang="pt-BR" link="#000080" vlink="#800000" dir="ltr"><h3 class="western">
+Starter Workflow</h3>
+<p><br/>
+<br/>
+
+</p>
+<p>O conceito de <b>Starter Workflows</b> existe e é oficial no
+ecossistema do GitHub! Inclusive, você provavelmente já usou sem
+perceber quando clica na aba &quot;Actions&quot; de um repositório
+novo e o GitHub sugere modelos prontos para Node.js, Python, Docker,
+etc.</p>
+<p>Vamos entender o que ele é, por que é a resposta certa para essa
+questão e como se difere de outros recursos.</p>
+<h3 class="western">O que é um Starter Workflow?</h3>
+<p>Um <b>Starter Workflow</b> (ou modelo de inicialização) funciona
+como um <b>esqueleto ou template de ponto de partida</b>.</p>
+<p>Quando uma equipe ou organização quer padronizar os primeiros
+passos dos novos projetos, ela pode criar modelos próprios de
+arquivos <code class="western">.yml</code> (geralmente salvos em um
+repositório especial na organização chamado <code class="western">.github</code>).
+Quando um desenvolvedor cria um novo repositório ou vai adicionar
+uma action, ele pode escolher esse modelo.</p>
+<h3 class="western">Analisando a Questão</h3>
+<p>O enunciado dizia:</p>
+<blockquote><i>&quot;Uma equipe quer oferecer um ponto de partida
+para novos projetos, permitindo que <b>cada repositório adapte
+comandos e gatilhos livremente</b>.&quot;</i></blockquote>
+<p>A resposta correta é a <b>C: Starter workflow que gera uma cópia
+inicial editável</b>.</p>
+<p>Por que essa é a única que atende perfeitamente?</p>
+<ol>
+	<li><p><b>Gera uma cópia inicial editável:</b> Quando você usa um
+	<i>starter workflow</i>, o GitHub <b>copia</b> aquele arquivo <code class="western">.yml</code>
+	para dentro do seu repositório.</p></li>
+	<li><p><b>Liberdade total de adaptação:</b> Como o arquivo agora
+	mora dentro do seu repositório, você é o dono dele. Você pode
+	abrir o código, mudar comandos, alterar gatilhos (<code class="western">on:
+	push</code>, <code class="western">on: pull_request</code>) e
+	customizar da forma que quiser.</p></li>
+	<li><p><b>Sem sincronização forçada:</b> Como explica a correção
+	da imagem, alterações futuras feitas no template original da
+	organização <b>não</b> afetam automaticamente os arquivos que já
+	foram copiados para os repositórios dos projetos. Cada um ganha
+	independência para evoluir o seu próprio workflow.</p></li>
+</ol>
+<h3 class="western">Por que as outras alternativas estão erradas?</h3>
+<ul>
+	<li><p><b>A) Reusable workflow obrigatório, sem configuração no
+	consumidor:</b> Um <i>reusable workflow</i> (workflow reutilizável)
+	fica centralizado em um lugar e os outros repositórios apenas o
+	&quot;chamam&quot; como uma função externa. Se a regra exige que o
+	repositório consumidor adapte comandos livremente ou edite o
+	esqueleto, o workflow reutilizável engessa isso, pois ele roda o
+	código centralizado sem permitir cópias editáveis locais daquela
+	forma.</p></li>
+	<li><p><b>B) Composite action que define os eventos do repositório:</b>
+	Uma <i>composite action</i> serve para agrupar passos (<code class="western">steps</code>)
+	repetitivos de código dentro de uma action personalizada, mas ela
+	<b>não</b> define os gatilhos globais (<code class="western">on:
+	...</code>) de eventos do repositório nem serve de template inicial
+	de workflow.</p></li>
+	<li><p><b>D) Artefato compartilhado que substitui o arquivo YAML:</b>
+	Artefatos são arquivos gerados <i>durante</i> a execução de um
+	build (como <code class="western">.zip</code> ou binários), e não
+	arquivos de configuração de infraestrutura ou templates para
+	iniciar um projeto.</p></li>
+</ul>
+<p>Ficou claro o conceito do <i>starter workflow</i> como aquele
+modelo inicial que você copia para o repositório e ganha total
+liberdade para editar?</p>
+<p style="line-height: 100%; margin-bottom: 0cm"><br/>
+
+</p>
+</body>
+</html>
